@@ -1,0 +1,24 @@
+{
+  "countries": ["Israel"],
+  "states": {
+    "Israel": ["Central District", "Jerusalem District", "Northern District", "Southern District"]
+  },
+  "cities": {
+    "Central District": ["Tel Aviv", "Petah Tikva", "Netanya"],
+    "Jerusalem District": ["Jerusalem"],
+    "Northern District": ["Haifa", "Nazareth", "Acre"],
+    "Southern District": ["Eilat", "Beersheba", "Ashdod"]
+  },
+  "streets": {
+    "Tel Aviv": ["Main St", "Second St"],
+    "Petah Tikva": ["Herzl St", "Rabin Blvd"],
+    "Netanya": ["Shalom St", "Haim Rd"],
+    "Jerusalem": ["Old St", "Ancient Rd"],
+    "Haifa": ["Downtown St", "Central Ave"],
+    "Nazareth": ["Nazareth St", "Market Rd"],
+    "Acre": ["Old City St", "Port Rd"],
+    "Eilat": ["North Beach St", "South Beach Rd"],
+    "Beersheba": ["University St", "Ben Gurion Rd"],
+    "Ashdod": ["Sea St", "Port Blvd"]
+  }
+}
