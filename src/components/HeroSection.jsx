@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGsapAnimation from '../hooks/useGsapAnimation';
 import ballotPhones from '../assets/ballotPhones.png';
@@ -43,9 +42,9 @@ const HeroSection = () => {
           <div className="w-full md:w-1/2 p-4 md:text-left">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">Welcome to the Future of Elections</h1>
             <p className="text-lg md:text-2xl lg:text-2xl mb-6">Secure, Transparent, and Trustworthy Voting with <b>VoteChain</b></p>
-            <div>
+            <div className='gap-3'>
               <button 
-                className="sm:mr-3 mb-3 lg:mb-0 px-8 py-4 bg-secondary text-white rounded-lg text-lg md:text-lg lg:text-lg font-semibold hover:bg-secondary-200 transition duration-300 shadow-lg"
+                className="mx-3 mb-3 lg:mb-0 px-8 py-4 bg-secondary text-white rounded-lg text-lg md:text-lg lg:text-lg font-semibold hover:bg-secondary-200 transition duration-300 shadow-lg"
                 onClick={() => navigate('/login')}
               >
                 Get Started

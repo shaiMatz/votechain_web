@@ -1,4 +1,3 @@
-import React from 'react';
 import useGsapAnimation from '../hooks/useGsapAnimation';
 
 const JoinUsSection = () => {

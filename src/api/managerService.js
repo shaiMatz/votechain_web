@@ -1,5 +1,5 @@
 import useAPI from './useAPI';
-import {BASE_API_URL} from '../config';
+import { BASE_API_URL } from '../config';
 
 export const useCreateManager = () => {
   const { data, loading, error, fetchData } = useAPI();
@@ -23,4 +23,27 @@ export const useDeleteManager = () => {
   const { data, loading, error, fetchData } = useAPI();
   const deleteManager = (id) => fetchData(`${BASE_API_URL}/delete_manager`, 'POST', { id });
   return { data, loading, error, deleteManager };
+};
+export const useCreateCandidate = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const createCandidate = (candidateData) => fetchData(`${BASE_API_URL}/create_candidate`, 'POST', candidateData);
+  return { data, loading, error, createCandidate };
+};
+
+export const useGetCandidate = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const getCandidate = (id) => fetchData(`${BASE_API_URL}/get_candidate`, 'POST', { id });
+  return { data, loading, error, getCandidate };
+};
+
+export const useUpdateCandidate = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const updateCandidate = (candidateData) => fetchData(`${BASE_API_URL}/update_candidate`, 'POST', candidateData);
+  return { data, loading, error, updateCandidate };
+};
+
+export const useDeleteCandidate = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const deleteCandidate = (id) => fetchData(`${BASE_API_URL}/delete_candidate`, 'POST', { id });
+  return { data, loading, error, deleteCandidate };
 };

@@ -1,17 +1,24 @@
-import React, { useContext } from 'react';
+import { useContext, useEffect,useState } from 'react';
 import { ElectionContext } from '../contexts/ElectionContext';
 import { useResponsiveJSX } from '../hooks/useResponsiveJSX';
 import { breakpoints } from '../config';
-import DashboardHeader from '../components/DashboardHeader';
 import ElectionList from '../components/ElectionList';
 import Navbar from '../components/Navbar';
 
 const VoterDashboard = () => {
   const { elections } = useContext(ElectionContext);
+  console.log("elections", elections);
   const index = useResponsiveJSX(breakpoints);
 
-  const upcomingElections = elections?.filter(election => !election.isended) || [];
-  const closedElections = elections?.filter(election => election.isended) || [];
+  const [upcomingElections, setUpcomingElections] = useState([]);
+  const [closedElections, setClosedElections] = useState([]);
+
+  useEffect(() => {
+    if (Array.isArray(elections)) {
+      setUpcomingElections(elections.filter(election => !election.isended));
+      setClosedElections(elections.filter(election => election.isended));
+    }
+  }, [elections]);
 
   return (
     <div className={`p-10 ${index === 0 ? 'bg-white-100' : 'bg-white-100'} min-h-screen`}>

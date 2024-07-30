@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from 'react';
+/* eslint-disable react/prop-types */
+import { createContext, useState, useContext } from 'react';
 import addressData from '../addresses.json';  // Make sure to place addresses.json in the src directory
 
 const AddressContext = createContext();

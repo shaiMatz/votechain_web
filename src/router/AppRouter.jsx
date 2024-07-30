@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import  { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from '../contexts/AuthContext';
 import LandingPage from '../pages/LandingPage';
@@ -10,7 +10,10 @@ import VoterDashboard from '../pages/VoterDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { ElectionProvider } from '../contexts/ElectionContext';
 import { AddressProvider } from '../contexts/AddressContext';
-
+import { VotingPermissionProvider } from '../contexts/VotingPermissionContext';
+import VotePage from '../pages/VotePage';
+import { EAElectionProvider } from '../contexts/EAElectionContext';
+import ResultsPage from '../pages/ResultsPage';
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
 
@@ -26,7 +29,9 @@ const AppRouter = () => {
           {user && user.role === 'voter' && <VoterDashboard />}
         </ProtectedRoute>
       } />
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/vote/:electionId" element={<VotePage />} />
+      <Route path="/results/:electionId" element={<ResultsPage />} /> 
+
     </Routes>
   );
 };
@@ -37,7 +42,11 @@ const App = () => {
       <AuthProvider>
         <ElectionProvider>
           <AddressProvider>
+            <VotingPermissionProvider>
+              <EAElectionProvider >
         <AppRouter />
+              </EAElectionProvider >
+            </VotingPermissionProvider>
         </AddressProvider>
         </ElectionProvider>
       </AuthProvider>

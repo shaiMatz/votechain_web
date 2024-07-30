@@ -6,9 +6,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const useGsapAnimation = (animationSettings) => {
   const ref = useRef(null);
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && !hasAnimated.current) {
       gsap.fromTo(
         ref.current,
         animationSettings.from,
@@ -22,6 +23,7 @@ const useGsapAnimation = (animationSettings) => {
           },
         }
       );
+      hasAnimated.current = true;
     }
   }, [animationSettings]);
 

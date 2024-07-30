@@ -1,23 +1,19 @@
 import useAPI from './useAPI';
-import {BASE_API_URL} from '../config';
-
-export const useCreateVote = () => {
-  const { data, loading, error, fetchData } = useAPI();
-  const createVote = (voteData) => fetchData(`${BASE_API_URL}/create_vote`, 'POST', voteData);
-  return { data, loading, error, createVote };
-};
-
-export const useGetVotesByElection = () => {
-  const { data, loading, error, fetchData } = useAPI();
-  const getVotesByElection = (electionId) => fetchData(`${BASE_API_URL}/get_vote_list_by_election`, 'POST', { id: electionId });
-  return { data, loading, error, getVotesByElection };
-};
+import { BASE_API_URL } from '../config';
 
 export const useCreateUser = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const createUser = (userData) => fetchData(`${BASE_API_URL}/create_user`, 'POST', userData);
+
+  const createUser = async (userData) => {
+    console.log("Sending user data to create user:", userData);
+    const response = await fetchData(`${BASE_API_URL}/create_user`, 'POST', userData);
+    console.log("Response from create user API:", response);
+    return response;
+  };
+
   return { data, loading, error, createUser };
 };
+
 
 export const useGetUser = () => {
   const { data, loading, error, fetchData } = useAPI();
@@ -35,4 +31,34 @@ export const useDeleteUser = () => {
   const { data, loading, error, fetchData } = useAPI();
   const deleteUser = (id) => fetchData(`${BASE_API_URL}/delete_user`, 'POST', { id });
   return { data, loading, error, deleteUser };
+};
+
+export const useLogin = () => {
+  const { data, loading, error, fetchData } = useAPI();
+
+  const login = async (loginData) => {
+    console.log('Login function called with data:', loginData);
+    try {
+      const result = await fetchData(`${BASE_API_URL}/login`, 'POST', loginData);
+      console.log('Login successful:', result);
+      return result;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  return { data, loading, error, login };
+};
+
+export const useCreateVote = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const createVote = (voteData) => fetchData(`${BASE_API_URL}/create_vote`, 'POST', voteData);
+  return { data, loading, error, createVote };
+};
+
+export const useGetVotesByElection = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const getVotesByElection = (electionId) => fetchData(`${BASE_API_URL}/get_vote_list_by_election`, 'POST', { id: electionId });
+  return { data, loading, error, getVotesByElection };
 };
