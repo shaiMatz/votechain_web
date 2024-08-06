@@ -1,15 +1,36 @@
 /* eslint-disable react/prop-types */
-import  { useState } from 'react';
+import  { useContext, useEffect, useState } from 'react';
 import { useAddress } from '../contexts/AddressContext';
 import { FaPlus, FaTrash, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { session, loadContract } from '../services/sessionService';
-import { createElections } from '../services/createElections';
+import { AuthContext } from '../contexts/AuthContext';
 
-const CreateElection = ({ onCreate, loading, error }) => {
-    const [electionData, setElectionData] = useState({
+const transformData = (data) => ({
+    id: data.id || '',
+    name: data.name || '',
+    startdate: data.startdate || '',
+    enddate: data.enddate || '',
+    isended: data.isended || 0,
+    candidates: (data.candidates || []).map((candidate) => ({
+        id: candidate.id || '',
+        name: candidate.name || '',
+        party: candidate.party || '',
+    })),
+    minage: data.voterscriteria?.minage || '',
+    maxage: data.voterscriteria?.maxage || '',
+    country: data.voterscriteria?.country || '',
+    state: data.voterscriteria?.state || '',
+    city: data.voterscriteria?.city || '',
+    userList: (Array.isArray(data.voterscriteria?.userList) ? data.voterscriteria.userList.join(', ') : data.voterscriteria?.userList || ''), // Convert array to string
+    criteriaType: data.voterscriteria?.userList?.length > 0 ? 'list' : 'attributes', // Assuming criteriaType is 'list' if userList has items, otherwise 'attributes'
+});
+
+
+const ElectionForm = ({ Data, onCreate, loading, error }) => {
+    const [electionData, setElectionData] = useState(Data ? transformData(Data) : {
         name: '',
         startdate: '',
         enddate: '',
+        isended: 0,
         candidates: [],
         minage: '',
         maxage: '',
@@ -17,14 +38,23 @@ const CreateElection = ({ onCreate, loading, error }) => {
         state: '',
         city: '',
         userList: '',
-        criteriaType: 'list'
+        criteriaType: 'list',
     });
+    const title = Data ? 'Edit Election' : 'Add Election';
+    const buttonText = Data ? 'Update Election' : 'Create Election';
 
     const [candidateName, setCandidateName] = useState('');
     const [candidateParty, setCandidateParty] = useState('');
-
+    const{user} = useContext(AuthContext);
     const { addresses } = useAddress();
     const [step, setStep] = useState(1);
+
+    useEffect(() => {
+        if (Data) {
+            setElectionData(transformData(Data));
+        }
+    }, [Data]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -59,29 +89,72 @@ const CreateElection = ({ onCreate, loading, error }) => {
         e.preventDefault();
         const data = { ...electionData };
 
-        if (electionData.criteriaType === 'list') {
+        if (data.criteriaType === 'list') {
             const validation = validateVoterIDs(data.userList);
             if (!validation.valid) {
                 alert(validation.message);
                 return;
             }
-            data.userList = data.userList.split(/[\s,]+/).map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id));
-        }
-        try {
-            const contract = await loadContract(session);
-            await createElections(session, contract, data); 
-            onCreate(data);
 
-            // Handle success (e.g., show a message or redirect)
+            if (typeof data.userList === 'string' && data.userList.trim().length > 0) {
+                if (data.userList.trim().length === 9) {
+                    data.userList = [data.userList.trim()];
+                } else {
+                    data.userList = data.userList
+                        .split(/[\s,]+/)
+                        .map((id) => id.trim())
+                        .filter((id) => id.length === 9);
+                }
+            } else {
+                data.userList = [];
+            }
+        } else {
+            data.userList = [];
+        }
+
+        // Transform the data to the required format
+        const payload = {
+            name: data.name,
+            startdate: data.startdate,
+            enddate: data.enddate,
+            isended: data.isended,
+            ea_id: user.id,
+            candidates: data.candidates.map((candidate) => ({
+                name: candidate.name,
+                party: candidate.party,
+            })),
+            voterscriteria: {
+                minage: parseInt(data.minage, 10),
+                maxage: parseInt(data.maxage, 10),
+                city: data.city,
+                state: data.state,
+                country: data.country,
+                userList: data.criteriaType === 'list'
+                    ? data.userList.map((id) => parseInt(id, 10))
+                    : [],
+            },
+        };
+
+        try {
+            onCreate(payload, data);
         } catch (error) {
-            // Handle error (e.g., show an error message)
-            console.error("Failed to create election:", error);
+            console.error('Failed to create election:', error);
         }
     };
 
 
-    const validateVoterIDs = (userList) => {
-        const ids = userList.split(/[\s,]+/).map(id => id.trim()).filter(id => id);
+
+    const validateVoterIDs = (userListString) => {
+        // Split the string into an array of IDs
+        if (!userListString) {
+            return { valid: false, message: "Voter ID list is empty." };
+        }
+        //check if have only 1 id
+        if (userListString.length === 9) {
+            return { valid: true, message: "" };
+        } 
+
+        const ids = userListString.split(/[\s,]+/).map(id => id.trim());
         const idSet = new Set(ids);
 
         if (ids.length !== idSet.size) {
@@ -89,8 +162,8 @@ const CreateElection = ({ onCreate, loading, error }) => {
         }
 
         for (let id of ids) {
-            if (!/^\d+$/.test(id)) {
-                return { valid: false, message: `Invalid ID found: ${id}. IDs should be numeric.` };
+            if (!/^\d{9}$/.test(id)) {
+                return { valid: false, message: `Invalid ID found: ${id}. IDs should be exactly 9 digits.` };
             }
         }
 
@@ -121,11 +194,11 @@ const CreateElection = ({ onCreate, loading, error }) => {
     return (
         <form onSubmit={handleSubmit} className="bg-transparent h-full w-full">
             {step === 1 && (
-                <div className='flex flex-col justify-between h-full w-full'>
+                <div className={`flex flex-col justify-between h-full w-full`}>
                     <div>
                         <div className="mb-4 flex items-center">
 
-                            <h2 className="text-xl md:text-2xl mb-4 text-gray-700">Add Election</h2>
+                            <h2 className="text-xl md:text-2xl mb-4 text-gray-700">{title}</h2>
                         </div>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">Election Name</label>
@@ -168,7 +241,7 @@ const CreateElection = ({ onCreate, loading, error }) => {
             )}
 
             {step === 2 && (
-                <div className='flex flex-col justify-between h-full w-full'>
+                <div className={`flex flex-col  justify-between h-full w-full`}>
                     <div>
                         <div className="mb-4 flex items-center">
                             <button type="button" onClick={handleBack} className="text-gray-700 mr-2">
@@ -176,12 +249,12 @@ const CreateElection = ({ onCreate, loading, error }) => {
                             </button>
                             <h2 className="text-xl md:text-2xl text-gray-700">Candidates</h2>
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-4 ">
                             {electionData.candidates && (
-                                <div className="mb-2 flex flex-col space-y-2">
+                                <div className="mb-2 flex flex-col space-y-2 h-3/5 overflow-y-auto">
                                     {electionData.candidates.map((candidate, index) => (
-                                        <div key={index} className="flex items-center justify-between p-2 border border-gray-300 rounded-lg bg-transparent">
-                                            <div>
+                                        <div key={index} className="flex  md:flex-row items-center justify-between p-2 border border-gray-300 rounded-lg bg-transparent">
+                                            <div className="mb-0">
                                                 <p className="font-semibold text-gray-800">{candidate.name}</p>
                                                 <p className="text-sm text-gray-600">{candidate.party}</p>
                                             </div>
@@ -192,8 +265,9 @@ const CreateElection = ({ onCreate, loading, error }) => {
                                     ))}
                                 </div>
                             )}
-                            <div className="flex items-center space-x-2">
-                                <input
+                            <div className="flex mt-4 items-center space-y-2 ">
+                                
+                                <div className='space-y-2 md:space-x-2'><input
                                     type="text"
                                     value={candidateName}
                                     onChange={(e) => setCandidateName(e.target.value)}
@@ -207,6 +281,7 @@ const CreateElection = ({ onCreate, loading, error }) => {
                                     placeholder="Party"
                                     className="flex-grow p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                                 />
+                                </div>
                                 <button type="button" onClick={handleAddCandidate} className="p-2 text-secondary-100 hover:text-secondary-500 rounded-lg">
                                     <FaPlus />
                                 </button>
@@ -217,8 +292,9 @@ const CreateElection = ({ onCreate, loading, error }) => {
                 </div>
             )}
 
+
             {step === 3 && (
-                <div className='flex flex-col justify-between h-full w-full'>
+                <div className="flex flex-col  justify-between h-full w-full">
                     <div>
                         <div className="mb-4 flex items-center">
                             <button type="button" onClick={handleBack} className="text-gray-700 mr-2">
@@ -353,7 +429,7 @@ const CreateElection = ({ onCreate, loading, error }) => {
                         </div>
                     </div>
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-primary text-white p-2 rounded-lg w-full" disabled={loading}>Create Election</button>
+                        <button type="submit" className="bg-primary text-white p-2 rounded-lg w-full" disabled={loading}>{buttonText}</button>
                     </div>
                 </div>
             )}
@@ -363,4 +439,4 @@ const CreateElection = ({ onCreate, loading, error }) => {
     );
 };
 
-export default CreateElection;
+export default ElectionForm;

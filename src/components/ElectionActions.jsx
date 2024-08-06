@@ -1,22 +1,52 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useCreateElection } from '../api/electionService';
 import { FaSearch, FaFilter, FaPlus } from 'react-icons/fa';
 import AddElectionModal from './AddElectionModal';
+import { ElectionContext } from '../contexts/ElectionContext';
+import { AuthContext } from '../contexts/AuthContext';
+import { session, loadContract } from '../services/sessionService';
+import { createElections } from '../services/createElections';
 
 const ElectionActions = ({ searchTerm, onSearchChange, filter, onFilterChange }) => {
     const [showForm, setShowForm] = useState(false);
     const { createElection, loading, error } = useCreateElection();
-
+    const { fetchFullElectionData } = useContext(ElectionContext);
     const toggleForm = () => {
         setShowForm(!showForm);
     };
+    const {user} = useContext(AuthContext);
 
-    const handleCreateElection = async (electionData) => {
-        await createElection(electionData, () => {
-            setShowForm(false); // Close the form on successful creation
-        });
+    const handleCreateElection = async (electionData, data) => {
+        try {
+            const result = await createElection(electionData);
+            console.log('Create Election Result:', result);
+
+            if (result&& result.data&&result.data.election_id) {
+                const electionIdBigInt = BigInt(result.data.election_id);
+
+                const contract = await loadContract(session);
+                const payload = {
+                    ...data,
+                    election_id: electionIdBigInt
+                };
+                console.log('Payload for createElections:', payload);
+
+                await createElections(session, contract, payload);
+                alert('Election created successfully!');
+                await fetchFullElectionData(user.id);
+                toggleForm();
+            } else {
+                alert('Failed to create election. Election ID is missing.');
+            }
+        } catch (err) {
+            console.error('Error creating election:', err);
+            alert('An unexpected error occurred.');
+        }
     };
+
+
+
 
     return (
         <div className="mb-6 px-4 md:px-6 pt-6 flex flex-col md:flex-row items-center justify-between">

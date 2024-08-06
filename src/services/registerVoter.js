@@ -16,7 +16,7 @@ export const registerVoter = async (voter, contract, session, eligibleElections)
     });
     console.log("Voter registered successfully.");
     try {
-        if (eligibleElections.length === 0) {
+        if (!eligibleElections||eligibleElections.length === 0) {
             console.log("No eligible elections found for voter.");
             return "No eligible elections found for voter.";
         }

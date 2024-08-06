@@ -1,17 +1,16 @@
 import useAPI from './useAPI';
 import { BASE_API_URL } from '../config';
-import { useCallback } from 'react'; // Import useCallback from the 'react' package
+import { useCallback } from 'react';
 
-// Hook for creating an election
 export const useCreateElection = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const createElection = async (electionData, onSuccess) => {
+  const createElection = useCallback(async (electionData, onSuccess) => {
     const result = await fetchData(`${BASE_API_URL}/create_election`, 'POST', electionData);
     if (!error && onSuccess) {
       onSuccess();
     }
     return result;
-  };
+  }, [fetchData, error]);
   return { data, loading, error, createElection };
 };
 
@@ -21,36 +20,40 @@ export const useGetElection = () => {
   return { data, loading, error, getElection };
 };
 
-// Hook for updating an election
 export const useUpdateElection = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const updateElection = (electionData) => fetchData(`${BASE_API_URL}/update_election`, 'POST', electionData);
+  const updateElection = useCallback((electionData) => fetchData(`${BASE_API_URL}/update_election`, 'POST', electionData), [fetchData]);
   return { data, loading, error, updateElection };
 };
 
-// Hook for deleting an election
 export const useDeleteElection = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const deleteElection = (id) => fetchData(`${BASE_API_URL}/delete_election`, 'POST', { id });
+  const deleteElection = useCallback((id) => fetchData(`${BASE_API_URL}/delete_election`, 'POST', { id }), [fetchData]);
   return { data, loading, error, deleteElection };
 };
 
-// Hook for getting elections by user
 export const useGetElectionsByUser = () => {
-  const { fetchData } = useAPI();
-
+  const { data, loading, error, fetchData } = useAPI();
   const getElectionsByUser = useCallback(async (userId) => {
-    console.log('Fetching elections for user ID:', userId); // Add console.log here
-    const result = await fetchData(`${BASE_API_URL}/get_elections_by_user`, 'POST', { user_id: userId });
-    console.log('Fetched elections:', result); // Add console.log here
-    return result;
+    const numericUserId = Number(userId); // Ensure userId is a number
+    console.log('Fetching elections for user ID:', numericUserId);
+    await fetchData(`${BASE_API_URL}/get_elections_by_user`, 'POST', { user_id: numericUserId });
   }, [fetchData]);
-
-  return { getElectionsByUser };
+  return { data, loading, error, getElectionsByUser };
 };
-// Hook for getting the winner of an election
+
+
 export const useGetElectionWinner = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const getElectionWinner = (electionId) => fetchData(`${BASE_API_URL}/get_election_winner`, 'POST', { election_id: electionId });
+  const getElectionWinner = useCallback((electionId) => fetchData(`${BASE_API_URL}/get_election_winner`, 'POST', { election_id: electionId }), [fetchData]);
   return { data, loading, error, getElectionWinner };
+};
+
+export const useGetElectionsByEA = () => {
+  const { data, loading, error, fetchData } = useAPI();
+  const getElectionsByEA = useCallback(async (eaId) => {
+    const result = await fetchData(`${BASE_API_URL}/get_elections_by_ea`, 'POST', { ea_id: eaId });
+    return result;
+  }, [fetchData]);
+  return { data, loading, error, getElectionsByEA };
 };

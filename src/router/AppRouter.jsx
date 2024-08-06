@@ -8,12 +8,14 @@ import ManagerDashboard from '../pages/ManagerDashboard';
 import EADashboard from '../pages/EADashboard';
 import VoterDashboard from '../pages/VoterDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
+import EAPage from '../pages/EAPage';
 import { ElectionProvider } from '../contexts/ElectionContext';
 import { AddressProvider } from '../contexts/AddressContext';
 import { VotingPermissionProvider } from '../contexts/VotingPermissionContext';
 import VotePage from '../pages/VotePage';
-import { EAElectionProvider } from '../contexts/EAElectionContext';
 import ResultsPage from '../pages/ResultsPage';
+import { EAProvider } from '../contexts/EAContext';
+import { ModalProvider } from '../contexts/ModalContext';
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
 
@@ -31,6 +33,7 @@ const AppRouter = () => {
       } />
       <Route path="/vote/:electionId" element={<VotePage />} />
       <Route path="/results/:electionId" element={<ResultsPage />} /> 
+      <Route path="/ea/:eaId" element={<EAPage />} /> 
 
     </Routes>
   );
@@ -39,17 +42,19 @@ const AppRouter = () => {
 const App = () => {
   return (
     <Router>
+      <ModalProvider>
       <AuthProvider>
         <ElectionProvider>
           <AddressProvider>
             <VotingPermissionProvider>
-              <EAElectionProvider >
+                <EAProvider>
         <AppRouter />
-              </EAElectionProvider >
+                </EAProvider>
             </VotingPermissionProvider>
         </AddressProvider>
         </ElectionProvider>
       </AuthProvider>
+      </ModalProvider>
     </Router>
   );
 };

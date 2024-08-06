@@ -13,6 +13,7 @@ export const createElections = async (session, contract, election) => {
 
         await session.transact({
             action: contract.action("createlect", {
+                election_id: election.election_id,
                 title: election.name,
                 start_time: startTime,
                 end_time: endTime,

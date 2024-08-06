@@ -7,7 +7,7 @@ const JoinUsSection = () => {
   });
 
   return (
-    <section ref={joinUsRef} className="text-center p-12 bg-gray-100">
+    <section ref={joinUsRef} className="text-center p-12 ">
       <h2 className="text-5xl font-bold mb-12 text-primary">Join Us</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="p-6 bg-white rounded-lg shadow-lg">

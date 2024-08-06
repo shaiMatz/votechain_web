@@ -7,7 +7,7 @@ const FAQSection = () => {
   });
 
   return (
-    <section ref={faqRef} className="text-center p-8 bg-gray-50">
+    <section ref={faqRef} className="text-center p-8 ">
       <h2 className="text-4xl font-bold mb-6 text-primary">FAQ</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="p-4 bg-white rounded-lg shadow-lg">

@@ -7,7 +7,7 @@ const VotingInfoSection = () => {
   });
 
   return (
-    <section ref={votingInfoRef} className="text-center p-12 bg-white">
+    <section ref={votingInfoRef} className="text-center p-12 ">
       <h2 className="text-5xl font-bold mb-12 text-primary">Voting Information</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="p-6 bg-gray-100 rounded-lg shadow-lg">

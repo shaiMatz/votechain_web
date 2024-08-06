@@ -1,33 +1,77 @@
 /* eslint-disable react/prop-types */
-import { createContext, useState, useEffect } from 'react';
-import { useGetElectionsByUser } from '../api/electionService';
-import useAuth from '../hooks/useAuth'; // Assuming you have a useAuth hook to get the logged-in user
+import { createContext, useState, useEffect, useCallback } from 'react';
+import { useGetElectionsByUser, useGetElectionsByEA, useDeleteElection, useGetElection } from '../api/electionService';
 
 export const ElectionContext = createContext();
 
 export const ElectionProvider = ({ children }) => {
-  const { user } = useAuth(); // Assuming the useAuth hook returns the logged-in user's info
   const [elections, setElections] = useState([]);
-  const { getElectionsByUser } = useGetElectionsByUser();
+  const [isFetched, setIsFetched] = useState({ user: false, ea: false });
 
-  useEffect(() => {
-    const fetchElections = async () => {
-      if (user && user.user_id) {
-        console.log('Fetching elections for user ID:', user.user_id);
-        try {
-          const response = await getElectionsByUser(user.user_id);
-          setElections(response.data);
-        } catch (err) {
-          console.error('Failed to fetch elections:', err);
-        }
+  const { data: userElections, loading: userLoading, error: userError, getElectionsByUser } = useGetElectionsByUser();
+  const { data: eaElections, loading: eaLoading, error: eaError, getElectionsByEA } = useGetElectionsByEA();
+  const { data: deleteData, loading: deleteLoading, error: deleteError, deleteElection } = useDeleteElection();
+  const { loading: electionLoading, error: electionError, getElection } = useGetElection();
+
+  const fetchElectionsByUser = useCallback(async (userId) => {
+    if (!isFetched.user) {
+      await getElectionsByUser(userId);
+      setIsFetched((prev) => ({ ...prev, user: true }));
+    }
+  }, [getElectionsByUser, isFetched]);
+  const fetchFullElectionData = useCallback(async (eaId) => {
+    if (eaId && !isFetched.ea) {
+      console.log("Fetching elections by EA...");
+      const res = await getElectionsByEA(eaId);
+      console.log("API Response:", res);
+      if (res.error_code === 0 && res.data) {
+        setIsFetched((prev) => ({ ...prev, ea: true }));
+        setElections(res.data);
+      } else {
+        console.error("Error fetching elections by EA:", eaError);
+        return;
       }
-    };
+    }
 
-    fetchElections();
-  }, [user, getElectionsByUser]);
+    if (elections.length > 0) {
+      console.log("Fetching full election data...");
+      const fullElectionDataPromises = elections.map(async (election) => {
+        const result = await getElection(election.id);
+        return { ...election, ...result.data };
+      });
 
+      const fullElectionData = await Promise.all(fullElectionDataPromises);
+      console.log("Full Election Data:", fullElectionData);
+      setElections(fullElectionData);
+    } else {
+      console.log("No elections found to fetch full data.");
+    }
+  }, [elections, eaError, getElection, getElectionsByEA, isFetched]);
+  useEffect(() => {
+    if (userElections && !userError) {
+      setElections(userElections);
+    }
+  }, [userElections, userError]);
+
+  const handleDeleteElection = async (id) => {
+    await deleteElection(id);
+    if (!deleteError && deleteData) {
+      setElections((prevElections) => prevElections.filter((election) => election.id !== id));
+    }
+  };
+
+  const loading = userLoading || eaLoading || deleteLoading || electionLoading;
+  const error = userError || eaError || deleteError || electionError;
   return (
-    <ElectionContext.Provider value={{ elections, setElections }}>
+    <ElectionContext.Provider value={{
+      elections,
+      setElections,
+      fetchElectionsByUser,
+      handleDeleteElection,
+      fetchFullElectionData,
+      loading,
+      error,
+    }}>
       {children}
     </ElectionContext.Provider>
   );

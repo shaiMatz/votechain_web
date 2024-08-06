@@ -22,7 +22,7 @@ const Modal = ({ title, content, onClose, onConfirm }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div ref={ref} className={`bg-white rounded-lg p-8 shadow-lg ${getModalSizeClass()} mx-auto`}>
+            <div ref={ref} className={`bg-white rounded-lg p-8 shadow-lg ${getModalSizeClass()} mx-auto relative`}>
                 <button
                     type="button"
                     onClick={onClose}
@@ -30,7 +30,7 @@ const Modal = ({ title, content, onClose, onConfirm }) => {
                 >
                     <IoClose className="h-6 w-6" />
                 </button>
-                <h2 className="text-3xl font-psemibold mb-6 text-primary">{title}</h2>
+                <h2 className="text-3xl font-semibold mb-6 text-primary">{title}</h2>
                 <p className="text-lg text-gray-600 mb-6">{content}</p>
                 <div className="flex justify-end space-x-4">
                     <button

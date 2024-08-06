@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import Modal from 'react-modal';
-import CreateElection from './CreateElection';
+import CreateElection from './ElectionForm';
 import { FaTimes } from 'react-icons/fa';
 
 Modal.setAppElement('#root');
 
-const AddElectionModal = ({ isOpen, onRequestClose, onCreate, loading, error }) => {
+const AddElectionModal = ({ Data, isOpen, onRequestClose, onCreate, loading, error }) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -21,7 +21,7 @@ const AddElectionModal = ({ isOpen, onRequestClose, onCreate, loading, error }) 
                 >
                     <FaTimes />
                 </button>
-                <CreateElection onCreate={onCreate} loading={loading} error={error} />
+                <CreateElection Data={Data} onCreate={onCreate} loading={loading} error={error} />
             </div>
         </Modal>
     );
