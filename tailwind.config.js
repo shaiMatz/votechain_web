@@ -69,6 +69,9 @@ export default {
         pextrabold: ["Poppins-ExtraBold", "sans-serif"],
         pblack: ["Poppins-Black", "sans-serif"],
       },
+      backgroundImage: {
+        'custom-radial': 'radial-gradient(circle, #FFFBFF 0%, #E6E6E6 100%)',
+      },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],
         'sm': ['0.875rem', { lineHeight: '1.25rem' }],

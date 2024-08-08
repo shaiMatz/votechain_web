@@ -11,28 +11,26 @@ import { ModalContext } from '../contexts/ModalContext';
 const EAPage = () => {
     const { eaId } = useParams();
     const { getManager, data: managerData, loading: loadingManager, error: errorManager } = useGetManager();
-    const { elections, fetchFullElectionData, setElections, deleteElection, electionToDelete, setElectionToDelete, loading, error } = useContext(ElectionContext);
+    const { elections, fetchElectionsByEA, fetchDetailedElections, deleteElection, electionToDelete, setElectionToDelete, loading, error } = useContext(ElectionContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
     const { isEAModalOpen, modalProps, closeModal } = useContext(ModalContext);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchEData = async () => {
             if (eaId) {
                 console.log('Fetching manager with ID:', eaId);
                 await getManager(eaId);
-                await fetchFullElectionData(eaId)
+                await fetchElectionsByEA(eaId)
+                if (elections.length > 0) {
+                    await fetchDetailedElections(elections);
+                }
             }
         };
-        fetchData();
-    }, [eaId, getManager, fetchFullElectionData]);
+        fetchEData();
+    }, [eaId, getManager, fetchElectionsByEA, fetchDetailedElections, elections]);
 
-    useEffect(() => {
-        if (elections) {
-            console.log('Setting elections:', elections);
-            setElections(elections);
-        }
-    }, [elections, setElections]);
+
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);

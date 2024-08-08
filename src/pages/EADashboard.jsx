@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState,useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import ElectionActions from '../components/ElectionActions';
 import ElectionItem from '../components/ElectionItem';
@@ -8,24 +8,26 @@ import { ModalContext } from '../contexts/ModalContext';
 import Modal from '../components/Modal';
 
 const EADashboard = () => {
-  const { elections, fetchFullElectionData, loading, error } = useContext(ElectionContext); // Default to empty array
+  const { elections, fetchElectionsByEA, fetchDetailedElections, loading, error } = useContext(ElectionContext); // Default to empty array
   const { user } = useContext(AuthContext); // Access AuthContext
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
-  const hasFetchedElections = useRef(false); 
   const { isEAModalOpen, modalProps, closeModal } = useContext(ModalContext);
 
-
-
   useEffect(() => {
-    if (user && user.id && !hasFetchedElections.current) {
-      console.log('Fetching elections for EA:', user.id);
-      fetchFullElectionData(user.id); // Pass eaId from user context
-      hasFetchedElections.current = true; // Set ref to true after first fetch
-      console.log('elections', elections);
-    }
-  }, [user, fetchFullElectionData,elections]);
+    const fetchData = async () => {
+      if (user && user.id) {
+        console.log('Fetching elections for EA:', user.id);
+        await fetchElectionsByEA(user.id)
+        if (elections.length > 0) {
+          await fetchDetailedElections(elections);
+        }
+        console.log('elections', elections);
+      }
+    };
 
+    fetchData();
+  }, [user, fetchElectionsByEA, fetchDetailedElections, elections]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -52,7 +54,7 @@ const EADashboard = () => {
         filter={filter}
         onFilterChange={handleFilterChange}
       />
-         <div className="mt-6 px-6">
+      <div className="mt-6 px-6">
         <h2 className="text-2xl font-bold text-primary mb-4">Elections</h2>
         {!loading && filteredElections.length === 0 && elections.length === 0 && (
           <p className="text-lg text-gray-700">No elections available at the moment. Please check back later or create a new election.</p>
@@ -67,7 +69,6 @@ const EADashboard = () => {
         </div>
         {loading && <p className="text-lg text-gray-700">Loading...</p>}
         {error && <p className="text-lg text-red-500">Error loading elections: {error.message}</p>}
-
       </div>
       {isEAModalOpen && (
         <Modal

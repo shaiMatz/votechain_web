@@ -42,7 +42,6 @@ export const useGetElectionsByUser = () => {
   return { data, loading, error, getElectionsByUser };
 };
 
-
 export const useGetElectionWinner = () => {
   const { data, loading, error, fetchData } = useAPI();
   const getElectionWinner = useCallback((electionId) => fetchData(`${BASE_API_URL}/get_election_winner`, 'POST', { election_id: electionId }), [fetchData]);

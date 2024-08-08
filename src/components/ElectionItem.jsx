@@ -6,6 +6,7 @@ import AddElectionModal from './AddElectionModal';
 import { useDeleteElection } from '../api/electionService';
 import { ModalContext } from '../contexts/ModalContext';
 import UpdateElection from './UpdateElection';
+import { AuthContext } from '../contexts/AuthContext';
 
 const ElectionItem = ({ election }) => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -13,7 +14,7 @@ const ElectionItem = ({ election }) => {
     const menuRef = useRef(null);
     const { deleteElection } = useDeleteElection();
     const { openModal } = useContext(ModalContext);
-
+    const { user } = useContext(AuthContext);
     const handleDelete = () => {
         openModal({
             title: 'Confirm Deletion',
@@ -66,7 +67,7 @@ const ElectionItem = ({ election }) => {
     const isStarted = now >= startDate && now <= endDate;
     const isEnded = now > endDate;
     const isStartingSoon = now < startDate && startDate - now <= 7 * 24 * 60 * 60 * 1000; // Starting within a week
-    const isEditable = !isStarted && !isEnded;
+    const isEditable = !isStarted && !isEnded || user.role === 'manager';
 
     let statusLabel = '';
     if (isEnded) {
