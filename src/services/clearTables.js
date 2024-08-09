@@ -1,7 +1,7 @@
 export const clearTables = async ( session, contract) => {
     try {
         await session.transact({
-            action: contract.action("cleartables"),
+            action: contract.action("cleartables", {}),
         });
         return "tables cleared successfully.";
     } catch (error) {

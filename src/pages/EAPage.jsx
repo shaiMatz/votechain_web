@@ -19,16 +19,26 @@ const EAPage = () => {
     useEffect(() => {
         const fetchEData = async () => {
             if (eaId) {
-                console.log('Fetching manager with ID:', eaId);
-                await getManager(eaId);
-                await fetchElectionsByEA(eaId)
-                if (elections.length > 0) {
-                    await fetchDetailedElections(elections);
+                try {
+                    console.log('Fetching manager with ID:', eaId);
+                    const managerResponse = await getManager(eaId.toString());
+                    if (managerResponse && managerResponse.error_code === 1) return;
+
+                    const electionsResponse = await fetchElectionsByEA(managerResponse.data.id);
+                    console.log("res2", electionsResponse);
+                    if (electionsResponse && electionsResponse.error_code === 1) return;
+
+                    if (electionsResponse.data && electionsResponse.data.length > 0) {
+                        await fetchDetailedElections();
+                    }
+                } catch (error) {
+                    console.error('Error fetching data:', error);
                 }
+                console.log("end");
             }
         };
         fetchEData();
-    }, [eaId, getManager, fetchElectionsByEA, fetchDetailedElections, elections]);
+    }, [eaId, getManager, fetchElectionsByEA, fetchDetailedElections]);
 
 
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef,useState } from 'react';
+import { useRef,useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShaderGradientCanvas, ShaderGradient } from 'shadergradient';
@@ -52,20 +52,7 @@ const GradientBackground = () => {
 
     const urlString = `https://www.shadergradient.co/customize?animate=${settings.animate}&axesHelper=${settings.axesHelper}&bgColor1=${encodeURIComponent(settings.bgColor1)}&bgColor2=${encodeURIComponent(settings.bgColor2)}&brightness=${settings.brightness}&cAzimuthAngle=${settings.cAzimuthAngle}&cDistance=${settings.cDistance}&cPolarAngle=${settings.cPolarAngle}&cameraZoom=${settings.cameraZoom}&color1=${encodeURIComponent(settings.color1)}&color2=${encodeURIComponent(settings.color2)}&color3=${encodeURIComponent(settings.color3)}&embedMode=${settings.embedMode}&envPreset=${settings.envPreset}&format=${settings.format}&fov=${settings.fov}&frameRate=${settings.frameRate}&gizmoHelper=${settings.gizmoHelper}&grain=${settings.grain}&lightType=${settings.lightType}&pixelDensity=${settings.pixelDensity}&positionX=${settings.positionX}&positionY=${settings.positionY}&positionZ=${settings.positionZ}&range=${settings.range}&rangeEnd=${settings.rangeEnd}&rangeStart=${settings.rangeStart}&reflection=${settings.reflection}&rotationX=${settings.rotationX}&rotationY=${settings.rotationY}&rotationZ=${settings.rotationZ}&shader=${settings.shader}&toggleAxis=${settings.toggleAxis}&type=${settings.type}&uDensity=${settings.uDensity}&uFrequency=${settings.uFrequency}&uSpeed=${settings.uSpeed}&uStrength=${settings.uStrength}&uTime=${settings.uTime}&wireframe=${settings.wireframe}`;
 
-    useEffect(() => {
-        gsap.to(backgroundRef.current, {
-            scale: 0,
-            
-            scrollTrigger: {
-                trigger: ".how-it-works-section",
-                start: "top center",
-                end: "bottom center",
-                scrub: true,
-
-            },
-        });
-    }, []);
-
+   
     return (
         <div ref={backgroundRef} className="absolute w-full h-full -z-10">
             <ShaderGradientCanvas style={{ width: '100%', height: '100%' }}>

@@ -8,14 +8,21 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
     const [email, setEmail] = useState(editData ? editData.email : '');
     const [password, setPassword] = useState(editData ? editData.password : ''); // Don't prefill the password for security reasons
     const [userId, setUserId] = useState(editData ? editData.user_id : '');
+    const [date] = useState(editData ? editData.date : '');
     const [errors, setErrors] = useState({});
     const { error } = useContext(EAContext);
-    console.log("edit",editData)
-    const handleSubmit = (e) => {
+    const [loading, setLoading] = useState(false); // Add loading state
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validateInputs();
         if (Object.keys(validationErrors).length === 0) {
-            onSubmit({ fullname, email, password, user_id: userId, id: editData ? editData.id : undefined });
+            setLoading(true); // Set loading to true when submission starts
+            try {
+                await onSubmit({ fullname, email, password, user_id: userId, id: editData ? editData.id : undefined, date });
+            } finally {
+                setLoading(false); // Set loading to false once submission is done
+            }
         } else {
             setErrors(validationErrors);
         }
@@ -47,7 +54,7 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
                     <IoClose className="h-6 w-6" />
                 </button>
                 <h2 className="text-3xl font-semibold mb-6 text-primary">{editData ? 'Edit EA' : 'Add New EA'}</h2>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-md font-medium text-gray-700 mb-2">User ID</label>
@@ -99,9 +106,17 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full py-2 px-4 border rounded-lg bg-purple-500 text-white shadow-md hover:bg-purple-600 transition duration-200 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        disabled={loading} // Disable button while loading
+                        className={`w-full py-2 px-4 border rounded-lg bg-purple-500 text-white shadow-md hover:bg-purple-600 transition duration-200 ease-in-out transform ${loading ? 'cursor-not-allowed' : 'hover:-translate-y-1'} focus:outline-none focus:ring-2 focus:ring-gray-300`}
                     >
-                        Confirm
+                        {loading ? (
+                            <svg className="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C6.477 0 2 4.477 2 10h2zm2 5.292A7.974 7.974 0 014 12H2c0 3.866 2.18 7.165 5.292 8.708l.708-.708z"></path>
+                            </svg>
+                        ) : (
+                            'Confirm'
+                        )}
                     </button>
                 </form>
                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}

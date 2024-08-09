@@ -6,7 +6,7 @@ export const useCreateManager = () => {
     const { data, loading, error, fetchData } = useAPI();
     const createManager = useCallback((managerData) => {
         console.log("Creating manager with data:", managerData);
-        return fetchData(`${BASE_API_URL}/create_manager`, 'POST', managerData);
+        return fetchData(`${BASE_API_URL}//create_user`, 'POST', managerData);
     }, [fetchData]);
     return { data, loading, error, createManager };
 };
@@ -32,9 +32,9 @@ export const useUpdateManager = () => {
 export const useGetManager = () => {
     const { data, loading, error, fetchData } = useAPI();
 
-    const getManager = useCallback((id) => {
-        console.log("Fetching manager with ID:", id);
-        return fetchData(`${BASE_API_URL}/get_manager`, 'POST', { id });
+    const getManager = useCallback((user_id) => {
+        console.log("Fetching manager with ID:", user_id);
+        return fetchData(`${BASE_API_URL}/get_manager`, 'POST', { user_id });
     }, [fetchData]);
 
     return { data, loading, error, getManager };

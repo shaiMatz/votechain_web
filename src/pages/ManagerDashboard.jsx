@@ -104,7 +104,7 @@ const ManagerDashboard = () => {
 
   const handleCreateEA = async ({ fullname, email, password, user_id }) => {
     const userData = {
-      name: fullname,
+      fullname: fullname,
       email: email,
       user_id,
       password,
@@ -188,9 +188,10 @@ const ManagerDashboard = () => {
     setDropdownOpen(null);
   };
 
-  const handleUpdate = async ({ fullname, email, password, user_id, id }) => {
+  const handleUpdate = async ({ fullname, email, password, user_id, id ,date}) => {
     const updatedData = {
       id,
+      date,
       name: fullname,
       email: email,
       user_id,
@@ -292,8 +293,8 @@ const ManagerDashboard = () => {
           </select>
         </div>
 
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full bg-white shadow-md rounded-lg">
+        <div className=" w-full ">
+          <table className="min-w-full overflow-x-auto bg-white  rounded-lg">
             <thead>
               <tr>
                 <th className="py-2 px-4 text-nowrap border-b text-start"></th>
@@ -324,16 +325,16 @@ const ManagerDashboard = () => {
                         <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10" onClick={(event) => event.stopPropagation()}>
                           <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleEditClick(ea.id, event)}>Edit</button>
                           <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleDeleteClick(ea.id, event)}>Delete</button>
-                          <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.id, event)}>View</button>
+                          <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.user_id, event)}>View</button>
                         </div>
                       )}
                     </div>
                   </td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.id)}>{ea.name}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.id)}>{ea.id}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.id)}>{ea.email}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.id)}>{ea.date}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.id)}>{ea.user_id}</td>
+                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.name}</td>
+                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.id}</td>
+                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.email}</td>
+                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.date}</td>
+                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.user_id}</td>
                 </tr>
               ))}
             </tbody>
@@ -390,7 +391,7 @@ const ManagerDashboard = () => {
       {isAddEaModalOpen && (
         <AddEAModal
           isOpen={isAddEaModalOpen}
-          onClose={() => setIsAddEaModalOpen(false)}
+          onClose={() => {setIsAddEaModalOpen(false); setEditEaData(null);}}
           onSubmit={editEaData ? handleUpdate : handleCreateEA}
           editData={editEaData} // Correctly pass editEaData instead of editData
         />

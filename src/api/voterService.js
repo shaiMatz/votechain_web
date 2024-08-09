@@ -40,7 +40,6 @@ export const useLogin = () => {
     console.log('Login function called with data:', loginData);
     try {
       const result = await fetchData(`${BASE_API_URL}/login_user`, 'POST', loginData);
-      console.log('Login successful:', result);
       return result;
     } catch (error) {
       console.error('Login failed:', error);

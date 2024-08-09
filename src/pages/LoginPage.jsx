@@ -55,7 +55,6 @@ const LoginPage = () => {
       <div className="flex justify-center items-center mt-10">
         <form onSubmit={handleSubmit} className="w-full max-w-md p-6 md:p-10">
           <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-secondary">Login</h2>
-          {error && <div className="mb-4 text-red-500">{error}</div>}
           <div className="mb-4 md:mb-6">
             <label className="block text-sm md:text-base font-bold mb-2 text-gray-700">Id</label>
             <input
@@ -78,11 +77,33 @@ const LoginPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-secondary text-white py-2 md:py-3 rounded-lg font-semibold hover:bg-secondary-200 transition duration-300"
+            className="w-full bg-secondary text-white py-2 md:py-3 rounded-lg font-semibold hover:bg-secondary-200 transition duration-300 flex justify-center items-center"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? (
+              <svg
+                className="animate-spin h-5 w-5 text-white mr-3"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                ></path>
+              </svg>
+            ) : 'Login'}
           </button>
+
           <p className="text-center mt-4 text-gray-800">
             Don&apos;t have an account?{' '}
             <button
@@ -93,6 +114,10 @@ const LoginPage = () => {
               Sign Up
             </button>
           </p>
+
+          {error && <div className="mb-4 text-red-500 mt-3">{error}</div>}
+
+
         </form>
       </div>
     </div>

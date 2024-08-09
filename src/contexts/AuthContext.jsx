@@ -3,7 +3,7 @@ import { createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../api/voterService';
 import { mintNftToUser } from '../services/mintNftToUser';
-import { session, loadContract  } from '../services/sessionService';
+import { session, loadContract } from '../services/sessionService';
 
 export const AuthContext = createContext();
 
@@ -17,21 +17,20 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData, checked = false, eligibleElections) => {
     setLoading(true);
     setError(null);
-    console.log(userData);
 
     try {
-      const ans=await apiLogin(userData);
+      const ans = await apiLogin(userData);
       if (ans && ans.error_code) {
         setError(ans.message || 'Login failed');
       } else {
-        console.log(ans);
         setUser(ans.data);
-        if(!checked){
+        if (!checked) {
           const contract = loadContract();
-          if (eligibleElections&&eligibleElections.length>0){
+          if (eligibleElections && eligibleElections.length > 0) {
             await mintNftToUser(ans.data, contract, session, eligibleElections);
-         }}
-         navigate('/dashboard');
+          }
+        }
+        navigate('/dashboard');
       }
     } catch (err) {
       setError(err.message);
