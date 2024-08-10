@@ -1,8 +1,7 @@
 /* eslint-disable react/prop-types */
-import  { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAddress } from '../contexts/AddressContext';
-import { FaPlus, FaTrash, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { AuthContext } from '../contexts/AuthContext';
+import { FaPlus, FaTrash, FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa';
 
 const transformData = (data) => ({
     id: data.id || '',
@@ -20,12 +19,13 @@ const transformData = (data) => ({
     country: data.voterscriteria?.country || '',
     state: data.voterscriteria?.state || '',
     city: data.voterscriteria?.city || '',
-    userList: (Array.isArray(data.voterscriteria?.userList) ? data.voterscriteria.userList.join(', ') : data.voterscriteria?.userList || ''), // Convert array to string
-    criteriaType: data.voterscriteria?.userList?.length > 0 ? 'list' : 'attributes', // Assuming criteriaType is 'list' if userList has items, otherwise 'attributes'
-});
+    userList: (Array.isArray(data.voterscriteria?.userList) ? data.voterscriteria.userList.join(', ') : data.voterscriteria?.userList || ''),
+    criteriaType: data.voterscriteria?.userList?.length > 0 ? 'list' : 'attributes',
+    ea_id: data.ea ? data.ea : '',
+}
+);
 
-
-const ElectionForm = ({ Data, onCreate, loading, error }) => {
+const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
     const [electionData, setElectionData] = useState(Data ? transformData(Data) : {
         name: '',
         startdate: '',
@@ -42,12 +42,12 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
     });
     const title = Data ? 'Edit Election' : 'Add Election';
     const buttonText = Data ? 'Update Election' : 'Create Election';
-
+    const [errors, setErrors] = useState({});
     const [candidateName, setCandidateName] = useState('');
     const [candidateParty, setCandidateParty] = useState('');
-    const{user} = useContext(AuthContext);
     const { addresses } = useAddress();
     const [step, setStep] = useState(1);
+    const [ea_id] = useState(id ? id : 0);
 
     useEffect(() => {
         if (Data) {
@@ -56,12 +56,18 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
     }, [Data]);
 
 
+    console.log('Election Data:', electionData);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setElectionData(prevData => ({ ...prevData, [name]: value }));
+        setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     };
 
     const handleAddCandidate = () => {
+        if (electionData.candidates.length >= 1) {
+            setErrors(prevErrors => ({ ...prevErrors, candidates: '' }));
+        }
+
         setElectionData(prevData => ({
             ...prevData,
             candidates: [...prevData.candidates, { name: candidateName, party: candidateParty }]
@@ -77,7 +83,34 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
         }));
     };
 
+    const validateDates = () => {
+        const newErrors = {};
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in yyyy-mm-dd format
+        if (electionData.startdate < today) {
+            newErrors.startdate = "Start date cannot be in the past.";
+        }
+        if (electionData.enddate < electionData.startdate) {
+            newErrors.enddate = "End date cannot be before the start date.";
+        }
+        return newErrors;
+    };
+
     const handleNext = () => {
+        let newErrors = {};
+        if (step === 1) {
+            newErrors = validateDates();
+            if (!electionData.name.trim()) newErrors.name = "Election name is required.";
+            if (!electionData.startdate) newErrors.startdate = "Start date is required.";
+            if (!electionData.enddate) newErrors.enddate = "End date is required.";
+        } else if (step === 2) {
+            if (electionData.candidates.length <= 1) newErrors.candidates = "At least two candidates are required.";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         setStep(prevStep => prevStep + 1);
     };
 
@@ -87,6 +120,24 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let newErrors = validateDates();
+
+        if (step === 3) {
+            if (electionData.criteriaType === 'list' && !electionData.userList.trim()) {
+                newErrors.userList = "Please provide a list of voter IDs or upload a file.";
+            }
+            if (electionData.criteriaType === 'attributes') {
+                if (!electionData.minage) newErrors.minage = "Minimum age is required.";
+                if (!electionData.maxage) newErrors.maxage = "Maximum age is required.";
+                if (!electionData.country) newErrors.country = "Country is required.";
+            }
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         const data = { ...electionData };
 
         if (data.criteriaType === 'list') {
@@ -112,13 +163,13 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
             data.userList = [];
         }
 
-        // Transform the data to the required format
+        console.log('Election Data:', data);
         const payload = {
             name: data.name,
             startdate: data.startdate,
             enddate: data.enddate,
             isended: data.isended,
-            ea_id: user.id,
+            ea_id: ea_id,
             candidates: data.candidates.map((candidate) => ({
                 name: candidate.name,
                 party: candidate.party,
@@ -135,6 +186,8 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
             },
         };
 
+        console.log('Payload:', payload);
+
         try {
             onCreate(payload, data);
         } catch (error) {
@@ -142,17 +195,13 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
         }
     };
 
-
-
     const validateVoterIDs = (userListString) => {
-        // Split the string into an array of IDs
         if (!userListString) {
             return { valid: false, message: "Voter ID list is empty." };
         }
-        //check if have only 1 id
         if (userListString.length === 9) {
             return { valid: true, message: "" };
-        } 
+        }
 
         const ids = userListString.split(/[\s,]+/).map(id => id.trim());
         const idSet = new Set(ids);
@@ -169,6 +218,7 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
 
         return { valid: true, message: "" };
     };
+
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -177,10 +227,7 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
             reader.onload = (event) => {
                 const text = event.target.result;
                 const lines = text.trim().split('\n');
-                // Check if the first line contains non-numeric characters (assuming it's a header if so)
                 const firstLineIsHeader = isNaN(lines[0].split(',')[0]);
-
-                // Remove the header if it's detected
                 const voterIds = firstLineIsHeader ? lines.slice(1) : lines;
                 setElectionData(prevData => ({ ...prevData, userList: voterIds.join('\n') }));
             };
@@ -189,16 +236,13 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
         }
     };
 
-
-
     return (
         <form onSubmit={handleSubmit} className="bg-transparent h-full w-full">
             {step === 1 && (
                 <div className={`flex flex-col justify-between h-full w-full`}>
                     <div>
                         <div className="mb-4 flex items-center">
-
-                            <h2 className="text-xl md:text-2xl mb-4 text-gray-700">{title}</h2>
+                            <h2 className="text-xl md:text-2xl  text-gray-700">{title}</h2>
                         </div>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">Election Name</label>
@@ -208,8 +252,9 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                 name="name"
                                 value={electionData.name}
                                 onChange={handleChange}
-                                className="w-full p-2 text-gray-700 border border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.name ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                             />
+                            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                         </div>
                         <div className="mb-4 md:flex md:space-x-4">
                             <div className="flex-1 mb-4 md:mb-0">
@@ -220,8 +265,9 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                     name="startdate"
                                     value={electionData.startdate}
                                     onChange={handleChange}
-                                    className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className={`w-full p-2 border ${errors.startdate ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.startdate ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                 />
+                                {errors.startdate && <p className="text-red-500 text-sm">{errors.startdate}</p>}
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="enddate" className="block text-gray-700 font-semibold mb-2">End Date</label>
@@ -231,8 +277,9 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                     name="enddate"
                                     value={electionData.enddate}
                                     onChange={handleChange}
-                                    className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className={`w-full p-2 border ${errors.enddate ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.enddate ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                 />
+                                {errors.enddate && <p className="text-red-500 text-sm">{errors.enddate}</p>}
                             </div>
                         </div>
                     </div>
@@ -241,7 +288,7 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
             )}
 
             {step === 2 && (
-                <div className={`flex flex-col  justify-between h-full w-full`}>
+                <div className={`flex flex-col justify-between h-full w-full`}>
                     <div>
                         <div className="mb-4 flex items-center">
                             <button type="button" onClick={handleBack} className="text-gray-700 mr-2">
@@ -249,7 +296,7 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                             </button>
                             <h2 className="text-xl md:text-2xl text-gray-700">Candidates</h2>
                         </div>
-                        <div className="mb-4 ">
+                        <div className="mb-4">
                             {electionData.candidates && (
                                 <div className="mb-2 flex flex-col space-y-2 h-3/5 overflow-y-auto">
                                     {electionData.candidates.map((candidate, index) => (
@@ -265,36 +312,36 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                     ))}
                                 </div>
                             )}
-                            <div className="flex mt-4 items-center space-y-2 ">
-                                
-                                <div className='space-y-2 md:space-x-2'><input
-                                    type="text"
-                                    value={candidateName}
-                                    onChange={(e) => setCandidateName(e.target.value)}
-                                    placeholder="Candidate Name"
-                                    className="flex-grow p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
-                                />
-                                <input
-                                    type="text"
-                                    value={candidateParty}
-                                    onChange={(e) => setCandidateParty(e.target.value)}
-                                    placeholder="Party"
-                                    className="flex-grow p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
-                                />
+                            <div className="flex mt-4 items-center space-y-2">
+                                <div className='space-y-2 lg:space-x-2'>
+                                    <input
+                                        type="text"
+                                        value={candidateName}
+                                        onChange={(e) => setCandidateName(e.target.value)}
+                                        placeholder="Candidate Name"
+                                        className="flex-grow p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={candidateParty}
+                                        onChange={(e) => setCandidateParty(e.target.value)}
+                                        placeholder="Party"
+                                        className="flex-grow p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                    />
                                 </div>
                                 <button type="button" onClick={handleAddCandidate} className="p-2 text-secondary-100 hover:text-secondary-500 rounded-lg">
                                     <FaPlus />
                                 </button>
                             </div>
+                            {errors.candidates && <p className="text-red-500 text-sm">{errors.candidates}</p>}
                         </div>
                     </div>
                     <button type="button" onClick={handleNext} className="bg-primary text-white p-2 rounded-lg flex flex-row gap-3 w-full items-center justify-center">Next <FaArrowRight /></button>
                 </div>
             )}
 
-
             {step === 3 && (
-                <div className="flex flex-col  justify-between h-full w-full">
+                <div className="flex flex-col justify-between h-full w-full">
                     <div>
                         <div className="mb-4 flex items-center">
                             <button type="button" onClick={handleBack} className="text-gray-700 mr-2">
@@ -338,9 +385,10 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                         name="userList"
                                         value={electionData.userList}
                                         onChange={handleChange}
-                                        className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className={`w-full p-2 border ${errors.userList ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.userList ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                         placeholder="User IDs separated by commas or new lines"
                                     />
+                                    {errors.userList && <p className="text-red-500 text-sm">{errors.userList}</p>}
                                     <div className="mt-2">
                                         <label className="block text-gray-700 font-semibold mb-2">Or Upload CSV File</label>
                                         <input
@@ -364,8 +412,9 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                                 name="minage"
                                                 value={electionData.minage}
                                                 onChange={handleChange}
-                                                className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                                className={`w-full p-2 border ${errors.minage ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.minage ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                             />
+                                            {errors.minage && <p className="text-red-500 text-sm">{errors.minage}</p>}
                                         </div>
                                         <div className="flex-1">
                                             <label htmlFor="maxage" className="block text-gray-600">Max Age</label>
@@ -377,8 +426,9 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                                 name="maxage"
                                                 value={electionData.maxage}
                                                 onChange={handleChange}
-                                                className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                                className={`w-full p-2 border ${errors.maxage ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.maxage ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                             />
+                                            {errors.maxage && <p className="text-red-500 text-sm">{errors.maxage}</p>}
                                         </div>
                                     </div>
                                     <div className="flex flex-wrap gap-4 mt-4">
@@ -389,11 +439,12 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                                 name="country"
                                                 value={electionData.country}
                                                 onChange={handleChange}
-                                                className="w-full p-2 text-gray-700 border border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                                className={`w-full p-2 text-gray-700 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.country ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                             >
                                                 <option value="">Select Country</option>
                                                 {addresses.countries.map(country => <option key={country} value={country}>{country}</option>)}
                                             </select>
+                                            {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
                                         </div>
                                         <div className="flex-1">
                                             <label htmlFor="state" className="block text-gray-600">State</label>
@@ -402,12 +453,13 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                                 name="state"
                                                 value={electionData.state}
                                                 onChange={handleChange}
-                                                className="w-full text-gray-700 p-2 border border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                                className={`w-full text-gray-700 p-2 border ${errors.state ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.state ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                                 disabled={!electionData.country}
                                             >
                                                 <option value="">Select State</option>
                                                 {electionData.country && addresses.states[electionData.country].map(state => <option key={state} value={state}>{state}</option>)}
                                             </select>
+                                            {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
                                         </div>
                                         <div className="flex-1">
                                             <label htmlFor="city" className="block text-gray-600">City</label>
@@ -416,12 +468,13 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                                                 name="city"
                                                 value={electionData.city}
                                                 onChange={handleChange}
-                                                className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                                                className={`w-full p-2 border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.city ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                                 disabled={!electionData.state}
                                             >
                                                 <option value="">Select City</option>
                                                 {electionData.state && addresses.cities[electionData.state].map(city => <option key={city} value={city}>{city}</option>)}
                                             </select>
+                                            {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -429,7 +482,10 @@ const ElectionForm = ({ Data, onCreate, loading, error }) => {
                         </div>
                     </div>
                     <div className="flex justify-between">
-                        <button type="submit" className="bg-primary text-white p-2 rounded-lg w-full" disabled={loading}>{buttonText}</button>
+                        <button type="submit" className="bg-primary text-white p-2 rounded-lg w-full flex items-center justify-center" disabled={loading}>
+                            {loading ? <FaSpinner className="animate-spin mr-2" /> : null}
+                            {buttonText}
+                        </button>
                     </div>
                 </div>
             )}

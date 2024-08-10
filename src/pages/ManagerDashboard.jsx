@@ -12,7 +12,7 @@ import { clearTables } from '../services/clearTables';
 import { loadContract, session } from '../services/sessionService';
 import { getRAM } from '../services/getRAM';
 import { useCreateManager, useGetEAList, useDeleteManager, useUpdateManager } from '../api/EAService';
-
+import { ADMINPASSWORD } from '../config';
 const ManagerDashboard = () => {
   const navigate = useNavigate();
   const { EAs, setEAs, setLoading, setError, loading } = useContext(EAContext);
@@ -128,7 +128,7 @@ const ManagerDashboard = () => {
   };
 
   const handleClearTables = async () => {
-    if (password === 'your_password') {
+    if (password === ADMINPASSWORD) {
       setIsClearingTables(true);
       const contract = await loadContract();
       const result = await clearTables(session, contract);
@@ -235,7 +235,7 @@ const ManagerDashboard = () => {
   return (
     <div className="md:p-6 min-h-screen bg-white text-gray-800">
       <Navbar />
-      <div className="mt-4 p-6 flex space-x-4">
+      <div className="mt-4 p-6 flex space-x-4 ">
         <button
           onClick={() => setIsAddEaModalOpen(true)}
           className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -293,8 +293,8 @@ const ManagerDashboard = () => {
           </select>
         </div>
 
-        <div className=" w-full ">
-          <table className="min-w-full overflow-x-auto bg-white  rounded-lg">
+        <div className=" w-full overflow-x-auto">
+          <table className="min-w-full  bg-white  rounded-lg">
             <thead>
               <tr>
                 <th className="py-2 px-4 text-nowrap border-b text-start"></th>

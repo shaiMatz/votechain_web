@@ -19,6 +19,9 @@ const VotePage = () => {
     const [showSecondModal, setShowSecondModal] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
 
+    console.log("electionId", electionId);
+    console.log("elections", elections);
+
     const election = elections.find(e => e.id === Number(electionId));
     const ref = useGsapAnimation({
         from: { opacity: 0, y: 50 },

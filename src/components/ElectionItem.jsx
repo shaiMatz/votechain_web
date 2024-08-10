@@ -3,27 +3,38 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import useGsapAnimation from '../hooks/useGsapAnimation';
 import AddElectionModal from './AddElectionModal';
-import { useDeleteElection } from '../api/electionService';
 import { ModalContext } from '../contexts/ModalContext';
-import UpdateElection from './UpdateElection';
-import { AuthContext } from '../contexts/AuthContext';
+import { ElectionContext } from '../contexts/ElectionContext';
 
-const ElectionItem = ({ election }) => {
+const ElectionItem = ({ election, isManager }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [editing, setEditing] = useState(false);
     const menuRef = useRef(null);
-    const { deleteElection } = useDeleteElection();
-    const { openModal } = useContext(ModalContext);
-    const { user } = useContext(AuthContext);
+    const { openModal, closeModal } = useContext(ModalContext);
+    const { handleDeleteElection, updateElectionData,loading,error } = useContext(ElectionContext); // Use handleDeleteElection and updateElectionData from context
+
     const handleDelete = () => {
         openModal({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this election? This action cannot be undone.',
             onConfirm: async () => {
-                await deleteElection(election.id);
+                try {
+                    const success = await handleDeleteElection(election.id);
+                    if (success) {
+                        console.log('Deletion successful');
+                        setMenuOpen(false);
+                    } else {
+                        console.error('Deletion failed');
+                    }
+                } catch (error) {
+                    console.error('Failed to delete election:', error);
+                } finally {
+                    closeModal();
+                }
+            },
+            onClose: () => {
                 setMenuOpen(false);
             },
-            onClose: () => setMenuOpen(false),
         });
     };
 
@@ -42,11 +53,16 @@ const ElectionItem = ({ election }) => {
         setMenuOpen(false);
     };
 
+
     const handleUpdate = async (updatedData) => {
         setEditing(false);
         updatedData.id = election.id;
-        await UpdateElection(updatedData)
-        // Update the election data with updatedData
+        const success = await updateElectionData(updatedData);
+        if (success) {
+            console.log('Election updated successfully');
+        } else {
+            console.error('Failed to update election');
+        }
     };
 
     useEffect(() => {
@@ -67,7 +83,7 @@ const ElectionItem = ({ election }) => {
     const isStarted = now >= startDate && now <= endDate;
     const isEnded = now > endDate;
     const isStartingSoon = now < startDate && startDate - now <= 7 * 24 * 60 * 60 * 1000; // Starting within a week
-    const isEditable = !isStarted && !isEnded || user.role === 'manager';
+    const isEditable = (!isStarted && !isEnded) || isManager;
 
     let statusLabel = '';
     if (isEnded) {
@@ -132,8 +148,8 @@ const ElectionItem = ({ election }) => {
                     isOpen={editing}
                     onRequestClose={() => setEditing(false)}
                     onCreate={handleUpdate}
-                    loading={false} // Replace with actual loading state if necessary
-                    error={null} // Replace with actual error state if necessary
+                    loading={loading} // Replace with actual loading state if necessary
+                    error={error} // Replace with actual error state if necessary
                 />
             )}
         </div>

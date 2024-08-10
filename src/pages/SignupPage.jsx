@@ -142,7 +142,7 @@ const SignupForm = () => {
 					user_id: fullCredentials.user_id,
 					password: fullCredentials.password
 				};
-				login(userData, true);
+				login(userData, false);
 			} else {
 				console.log(user);
 			}

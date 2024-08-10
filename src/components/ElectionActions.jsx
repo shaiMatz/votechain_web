@@ -4,24 +4,22 @@ import { useCreateElection } from '../api/electionService';
 import { FaSearch, FaFilter, FaPlus } from 'react-icons/fa';
 import AddElectionModal from './AddElectionModal';
 import { ElectionContext } from '../contexts/ElectionContext';
-import { AuthContext } from '../contexts/AuthContext';
 import { session, loadContract } from '../services/sessionService';
 import { createElections } from '../services/createElections';
 
-const ElectionActions = ({ searchTerm, onSearchChange, filter, onFilterChange }) => {
+const ElectionActions = ({ searchTerm, onSearchChange, filter, onFilterChange,ea_id }) => {
     const [showForm, setShowForm] = useState(false);
     const { createElection, loading, error } = useCreateElection();
-    const { fetchFullElectionData } = useContext(ElectionContext);
+    const { fetchElectionsByEA, fetchDetailedElections } = useContext(ElectionContext);
     const toggleForm = () => {
         setShowForm(!showForm);
     };
-    const {user} = useContext(AuthContext);
 
     const handleCreateElection = async (electionData, data) => {
         try {
             const result = await createElection(electionData);
             console.log('Create Election Result:', result);
-
+            console.log('EA IDaction:', ea_id);
             if (result&& result.data&&result.data.election_id) {
                 const electionIdBigInt = BigInt(result.data.election_id);
 
@@ -33,8 +31,27 @@ const ElectionActions = ({ searchTerm, onSearchChange, filter, onFilterChange })
                 console.log('Payload for createElections:', payload);
 
                 await createElections(session, contract, payload);
-                alert('Election created successfully!');
-                await fetchFullElectionData(user.id);
+                console.log('Election created successfully!');
+                const electionsResponse = await fetchElectionsByEA(ea_id);
+                if (!electionsResponse) {
+                    console.error('No response received from fetchElectionsByEA');
+                    return;
+                }
+
+                if (electionsResponse && electionsResponse.error_code === 1) return;
+
+                console.log('Elections Response:', electionsResponse);
+
+                if (electionsResponse.data && Array.isArray(electionsResponse.data)) {
+                    if (electionsResponse.data.length > 0) {
+                        await fetchDetailedElections(electionsResponse.data);
+                    } else {
+                        console.error('No elections found to fetch detailed data.');
+                    }
+                } else {
+                    console.error('Invalid or undefined elections data:', electionsResponse.data);
+                }
+
                 toggleForm();
             } else {
                 alert('Failed to create election. Election ID is missing.');
@@ -88,6 +105,7 @@ const ElectionActions = ({ searchTerm, onSearchChange, filter, onFilterChange })
                 onCreate={handleCreateElection}
                 loading={loading}
                 error={error}
+                id={ea_id}
             />}
         </div>
     );

@@ -28,16 +28,23 @@ export const useUpdateElection = () => {
 
 export const useDeleteElection = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const deleteElection = useCallback((id) => fetchData(`${BASE_API_URL}/delete_election`, 'POST', { id }), [fetchData]);
+
+  const deleteElection = useCallback(async (id) => {
+    const result = await fetchData(`${BASE_API_URL}/delete_election`, 'POST', { id });
+    if (result && result.error_code !== 0) {
+      throw new Error(result.message || 'Failed to delete election');
+    }
+    return result;
+  }, [fetchData]);
+
   return { data, loading, error, deleteElection };
 };
 
 export const useGetElectionsByUser = () => {
   const { data, loading, error, fetchData } = useAPI();
-  const getElectionsByUser = useCallback(async (userId) => {
-    const numericUserId = Number(userId); // Ensure userId is a number
-    console.log('Fetching elections for user ID:', numericUserId);
-    await fetchData(`${BASE_API_URL}/get_elections_by_user`, 'POST', { user_id: numericUserId });
+  const getElectionsByUser = useCallback(async (user_id) => {
+    var res=await fetchData(`${BASE_API_URL}/get_elections_by_user`, 'POST', {user_id} );
+    return res;
   }, [fetchData]);
   return { data, loading, error, getElectionsByUser };
 };

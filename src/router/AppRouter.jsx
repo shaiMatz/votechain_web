@@ -1,4 +1,4 @@
-import  { useContext } from 'react';
+import { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from '../contexts/AuthContext';
 import LandingPage from '../pages/LandingPage';
@@ -32,8 +32,8 @@ const AppRouter = () => {
         </ProtectedRoute>
       } />
       <Route path="/vote/:electionId" element={<VotePage />} />
-      <Route path="/results/:electionId" element={<ResultsPage />} /> 
-      <Route path="/ea/:eaId" element={<EAPage />} /> 
+      <Route path="/results/:electionId" element={<ResultsPage />} />
+      <Route path="/ea/:eaId" element={<EAPage />} />
 
     </Routes>
   );
@@ -43,17 +43,17 @@ const App = () => {
   return (
     <Router>
       <ModalProvider>
-      <AuthProvider>
         <ElectionProvider>
-          <AddressProvider>
-            <VotingPermissionProvider>
+          <AuthProvider>
+            <AddressProvider>
+              <VotingPermissionProvider>
                 <EAProvider>
-        <AppRouter />
+                  <AppRouter />
                 </EAProvider>
-            </VotingPermissionProvider>
-        </AddressProvider>
+              </VotingPermissionProvider>
+            </AddressProvider>
+          </AuthProvider>
         </ElectionProvider>
-      </AuthProvider>
       </ModalProvider>
     </Router>
   );

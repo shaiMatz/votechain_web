@@ -1,7 +1,9 @@
 import { isEligible, hashToken } from "./utils";
+import { session, loadContract } from "./sessionService";
 
-export const mintNftToUser = async (voterObject, contract, session, eligibleElections) => {
+export const mintNftToUser = async (voterObject, eligibleElections) => {
     try {
+        const contract = await loadContract(session);
         if (!voterObject || !contract || !session || !eligibleElections) {
             throw new Error("Invalid parameters provided.");
         }
@@ -9,9 +11,9 @@ export const mintNftToUser = async (voterObject, contract, session, eligibleElec
 
         const now = new Date();
         console.log("Current timestamp:", now);
-
+        console.log("Eligible Elections:", eligibleElections);
         const openElections = eligibleElections.filter(election => {
-            const endTime = new Date(election.end_time);
+            const endTime = new Date(election.enddate);
             console.log(`Election ID: ${election.id}, End Time: ${endTime}, Is Open: ${endTime > now}`);
             return endTime > now;
         });
@@ -24,7 +26,7 @@ export const mintNftToUser = async (voterObject, contract, session, eligibleElec
         }
 
         // Batch query to check for existing NFTs
-        const electionIds = openElections.map(e => e.id);
+        const electionIds = openElections.map(e => parseInt(e.id)); // Convert id to integer if needed
         const existingNfts = await contract.table("nftstb").all({
             scope: voterObject.username,
             code: contract.account,
@@ -35,18 +37,21 @@ export const mintNftToUser = async (voterObject, contract, session, eligibleElec
 
         console.log("Existing NFTs:", existingNfts);
 
-        const mintedElectionIds = new Set(existingNfts.rows.map(nft => nft.election_id));
+        // Ensure existingNfts and existingNfts.rows are defined
+        const mintedElectionIds = new Set(
+            existingNfts && existingNfts.rows ? existingNfts.rows.map(nft => nft.election_id) : []
+        );
 
         for (const election of openElections) {
             const birthdateTimestamp = new Date(voterObject.birthdate).getTime();
 
-            // Ensure criteria exist in each election item
-            if (!election.criteria) {
+            // Use `voterscriteria` instead of `criteria`
+            if (!election.voterscriteria) {
                 console.log("No specific criteria or invalid election ID:", election.id);
                 continue;
             }
 
-            const { criteria } = election;
+            const criteria = election.voterscriteria;
             if (!isEligible(voterObject, criteria, birthdateTimestamp)) {
                 console.log("Voter not eligible for election:", election.id);
                 continue;
@@ -81,3 +86,6 @@ export const mintNftToUser = async (voterObject, contract, session, eligibleElec
         throw new Error("Error processing elections.");
     }
 };
+
+
+

@@ -50,7 +50,7 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
       bgColor = 'bg-blue-200 text-blue-800';
     }
 
-    return <span className={`text-sm font-semibold px-2 py-1 rounded-full ${bgColor}`}>{statusLabel}</span>;
+    return <span className={`text-xs lg:text-sm font-semibold px-3 py-2 rounded-full ${bgColor}`}>{statusLabel}</span>;
   };
 
   const handleVoteClick = (electionId) => {
@@ -86,20 +86,23 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
                 </p>
               </div>
               <div className='mt-6 flex items-center justify-between'>
-                <p className="text-md text-gray-400 ">
-                  {election.startdate} to {election.enddate}
+                <p className="text-md text-gray-400">
+                  {election.startdate ? election.startdate : ''} to {election.enddate ? election.enddate : ''}
                 </p>
+
                 {new Date() >= new Date(election.startdate) && new Date() <= new Date(election.enddate) ? (
                   <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleVoteClick(election.id)}>
-                    Let&rsquo;s vote <FaArrowRight className="ml-2" />
+                    Let&rsquo;s vote <FaArrowRight className="ml-1" />
                   </p>
                 ) : (
-                  election.isended && (
+                  election.isended ? (
                     <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleResultsClick(election.id)}>
                       Results <FaArrowRight className="ml-2" />
                     </p>
-                  )
+                  ) : null
                 )}
+
+
               </div>
             </div>
           ))

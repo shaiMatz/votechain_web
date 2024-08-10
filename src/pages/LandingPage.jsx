@@ -70,7 +70,6 @@ const LandingPage = () => {
         onUpdate: function () {
           const bounds = dotRef.current.getBoundingClientRect();
           if (bounds.top <= 0 ) {  // Check if the timeline is not already paused
-            console.log("Top of the viewport, " + bounds.top);
             tl1.pause();  // Pause the timeline when the dot reaches the top of the viewport
             gsap.to(dotRef.current, { y: -bounds.top, duration: 0.1 }); // Adjust the position to exactly 0
           }

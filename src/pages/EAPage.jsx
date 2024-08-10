@@ -11,11 +11,10 @@ import { ModalContext } from '../contexts/ModalContext';
 const EAPage = () => {
     const { eaId } = useParams();
     const { getManager, data: managerData, loading: loadingManager, error: errorManager } = useGetManager();
-    const { elections, fetchElectionsByEA, fetchDetailedElections, deleteElection, electionToDelete, setElectionToDelete, loading, error } = useContext(ElectionContext);
+    const { detailedElections: elections, fetchElectionsByEA, fetchDetailedElections, deleteElection, electionToDelete, setElectionToDelete, loading, error } = useContext(ElectionContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
     const { isEAModalOpen, modalProps, closeModal } = useContext(ModalContext);
-
     useEffect(() => {
         const fetchEData = async () => {
             if (eaId) {
@@ -28,18 +27,21 @@ const EAPage = () => {
                     console.log("res2", electionsResponse);
                     if (electionsResponse && electionsResponse.error_code === 1) return;
 
-                    if (electionsResponse.data && electionsResponse.data.length > 0) {
-                        await fetchDetailedElections();
+                    if (electionsResponse && electionsResponse.data && Array.isArray(electionsResponse.data) && electionsResponse.data.length > 0) {
+                        console.log('Elections Response:', electionsResponse.data);
+                        var res = await fetchDetailedElections(electionsResponse.data);
+                        console.log("res3", res);
+                    } else {
+                        console.error('No valid data found in electionsResponse:', electionsResponse);
+                        // Handle cases where electionsResponse.data is not an array or is empty
                     }
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
-                console.log("end");
             }
         };
         fetchEData();
     }, [eaId, getManager, fetchElectionsByEA, fetchDetailedElections]);
-
 
 
     const handleSearchChange = (event) => {
@@ -56,14 +58,23 @@ const EAPage = () => {
 
     const confirmDeleteElection = async () => {
         if (electionToDelete) {
-            await deleteElection(electionToDelete);
+            console.log("Deleting Election:" + electionToDelete);
+            var res= await deleteElection(electionToDelete)
+            if(res.error_code === 0){
             setElectionToDelete(null);
+            console.log("Election Deleted," + electionToDelete);
+            }
+            else{
+                console.log("Election Not Deleted," + electionToDelete);
+            }
+
         }
     };
 
     const cancelDeleteElection = () => {
         setElectionToDelete(null);
     };
+
 
     const filteredElections = (elections || []).filter((election) => {
         const matchesSearch = election.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -73,8 +84,10 @@ const EAPage = () => {
         return matchesSearch && matchesFilter;
     });
 
+
+
     return (
-        <div className="p-4 md:p-10 min-h-screen">
+        <div  className="p-4 md:p-10 min-h-screen">
             <Navbar />
             <div className="mt-6 px-6">
                 <h2 className="text-2xl font-bold text-primary mb-4">Election Administrator Details</h2>
@@ -93,6 +106,7 @@ const EAPage = () => {
                 onSearchChange={handleSearchChange}
                 filter={filter}
                 onFilterChange={handleFilterChange}
+                ea_id={managerData?.id? managerData.id : null}
             />
             <div className="mt-6 px-6">
                 <h2 className="text-2xl font-bold text-primary mb-4">Elections</h2>
@@ -105,7 +119,7 @@ const EAPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {!loading && !error && elections && filteredElections.length > 0 ? (
                         filteredElections.map((election) => (
-                            <ElectionItem key={election.id} election={election} onDelete={handleDeleteElection} />
+                            <ElectionItem key={election.id} election={election} onDelete={handleDeleteElection} isManager={true}/>
                         ))
                     ) : (
                         <p className="text-lg text-gray-700">No elections available.</p>
@@ -118,6 +132,7 @@ const EAPage = () => {
                     content="Are you sure you want to delete this election? This action cannot be undone."
                     onClose={cancelDeleteElection}
                     onConfirm={confirmDeleteElection}
+
                 />
             )}
             {isEAModalOpen && (

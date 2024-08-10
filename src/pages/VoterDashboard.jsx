@@ -16,10 +16,11 @@ const VoterDashboard = () => {
 
 
   useEffect(() => {
-    if (user && user.user_id ) {
+    if (!elections || elections.length === 0) {
       fetchElectionsByUser(user.user_id);
     }
-  }, [user, fetchElectionsByUser]);
+  }, [elections, fetchElectionsByUser, user.user_id]);
+
 
   useEffect(() => {
     if (Array.isArray(elections)) {

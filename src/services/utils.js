@@ -17,20 +17,42 @@ export const hashToHex = async (input) => {
 export const stringToUint64_t = async (hexValue) => {
     return BigInt(`0x${hexValue}`);
 };
-
 export const isEligible = (voter, criteria, birthdateTimestamp) => {
-    const currentDate = new Date();
-    const minAgeTimestamp = new Date(currentDate.getFullYear() - criteria.minage, currentDate.getMonth(), currentDate.getDate()).getTime();
-    const maxAgeTimestamp = new Date(currentDate.getFullYear() - criteria.maxage, currentDate.getMonth(), currentDate.getDate()).getTime();
+    console.log("Checking eligibility:");
+    console.log("Voter Details:", voter);
+    console.log("Election Criteria:", criteria);
 
-    if ((criteria.minage && birthdateTimestamp > minAgeTimestamp) ||
-        (criteria.maxage && birthdateTimestamp < maxAgeTimestamp) ||
-        (criteria.city && voter.city !== criteria.city) ||
-        (criteria.state && voter.state !== criteria.state) ||
-        (criteria.country && voter.country !== criteria.country) ||
-        (criteria.userList && !criteria.userList.includes(voter.username))) {
-        return false;
+    // Calculate the voter's age
+    const currentDate = new Date();
+    const birthDate = new Date(birthdateTimestamp);
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDifference = currentDate.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && currentDate.getDate() < birthDate.getDate())) {
+        age--;
     }
 
+    console.log("Voter's age:", age);
+
+    // Check if userList is present and not empty
+    if (criteria.userList && criteria.userList.length > 0) {
+        if (!criteria.userList.includes(voter.user_id)) {
+            console.log("Voter's user_id is not in the userList.");
+            return false;
+        }
+    } else {
+        // If userList is not used, apply age and location checks
+        if (age < criteria.minage || age > criteria.maxage) {
+            console.log("Voter does not meet age criteria.");
+            return false;
+        }
+
+        if (voter.city !== criteria.city || voter.state !== criteria.state || voter.country !== criteria.country) {
+            console.log("Voter does not meet location criteria.");
+            return false;
+        }
+    }
+
+    console.log("Voter is eligible.");
     return true;
 };

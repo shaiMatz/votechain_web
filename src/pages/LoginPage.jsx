@@ -1,24 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
-import { useGetElectionsByUser } from '../api/electionService';
 
 const LoginPage = () => {
-  const { user, login, error, loading } = useAuth();
+  const { login, error, loading } = useAuth();
   const [credentials, setCredentials] = useState({ user_id: '', password: '' });
   const navigate = useNavigate();
-  const [eligibleElections, setEligibleElections] = useState([]);
-  const [isRegistered, setIsRegistered] = useState(false);
 
-  const { getElectionsByUser } = useGetElectionsByUser();
-  useEffect(() => {
-    if (isRegistered && user && user.role === 'voter') {
-      getElectionsByUser(credentials.user_id)
-        .then(response => setEligibleElections(response.data))
-        .catch(console.error);
-    }
-  }, [user, isRegistered, credentials.user_id, getElectionsByUser]);
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -26,10 +15,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(credentials, eligibleElections);
-    if (!error) {
-      setIsRegistered(true); // Set the registration flag to true only if there is no error
-    }
+    await login(credentials);
+    console.log('error:', error);
   };
 
   return (
@@ -115,7 +102,7 @@ const LoginPage = () => {
             </button>
           </p>
 
-          {error && <div className="mb-4 text-red-500 mt-3">{error}</div>}
+          {error && <div className="mb-4 text-center text-red-500 mt-3">{error}</div>}
 
 
         </form>
