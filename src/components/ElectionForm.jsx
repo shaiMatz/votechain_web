@@ -56,7 +56,6 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
     }, [Data]);
 
 
-    console.log('Election Data:', electionData);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setElectionData(prevData => ({ ...prevData, [name]: value }));
@@ -122,19 +121,30 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
         e.preventDefault();
         let newErrors = validateDates();
 
+
         if (step === 3) {
-            if (electionData.criteriaType === 'list' && !electionData.userList.trim()) {
-                newErrors.userList = "Please provide a list of voter IDs or upload a file.";
-            }
-            if (electionData.criteriaType === 'attributes') {
-                if (!electionData.minage) newErrors.minage = "Minimum age is required.";
-                if (!electionData.maxage) newErrors.maxage = "Maximum age is required.";
-                if (!electionData.country) newErrors.country = "Country is required.";
+            if (electionData.criteriaType === 'list') {
+                if (!electionData.userList.trim()) {
+                    newErrors.userList = "Please provide a list of voter IDs or upload a file.";
+                }
+                // Ensure attributes are not validated if criteriaType is 'list'
+                electionData.minage = null;
+                electionData.maxage = null;
+                electionData.country = '';
+                electionData.city = '';
+                electionData.state = '';
+            } else if (electionData.criteriaType === 'attributes') {
+                // Ensure that both state and age are provided
+                if (!electionData.state) newErrors.state = "State is required when selecting by attributes.";
+                if (!electionData.minage || !electionData.maxage) newErrors.age = "Both Min Age and Max Age are required when selecting by attributes.";
+            } else {
+                // If criteriaType is neither 'list' nor 'attributes', ensure at least one is selected
+                newErrors.criteriaType = "Please select a criteria type.";
             }
         }
-
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            console.log("Errors:", newErrors); // Debugging step
             return;
         }
 
@@ -169,7 +179,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
             startdate: data.startdate,
             enddate: data.enddate,
             isended: data.isended,
-            ea_id: data.ea_id,
+            ea_id: ea_id && ea_id!=0 ?ea_id:data.ea_id,
             candidates: data.candidates.map((candidate) => ({
                 name: candidate.name,
                 party: candidate.party,
@@ -413,7 +423,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                                                 type="number"
                                                 id="minage"
                                                 name="minage"
-                                                value={electionData.minage}
+                                                    value={electionData.minage || ''}
                                                 onChange={handleChange}
                                                 className={`w-full p-2 border ${errors.minage ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.minage ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                             />
@@ -427,7 +437,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                                                 type="number"
                                                 id="maxage"
                                                 name="maxage"
-                                                value={electionData.maxage}
+                                                value={electionData.maxage || ''} 
                                                 onChange={handleChange}
                                                 className={`w-full p-2 border ${errors.maxage ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-transparent focus:outline-none focus:ring-2 ${errors.maxage ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                                             />
@@ -479,6 +489,8 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                                             </select>
                                             {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                                         </div>
+                                            {errors.criteriaAttributes && <p className="text-red-500 text-sm text-center">{errors.criteriaAttributes}</p>}
+
                                     </div>
                                 </div>
                             )}
@@ -493,7 +505,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                 </div>
             )}
 
-            {error && <p className="text-red-500">{error.message}</p>}
+            {error && <p className="text-red-500 text-center">{error.message}</p>}
         </form>
     );
 };

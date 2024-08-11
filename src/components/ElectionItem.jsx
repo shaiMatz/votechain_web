@@ -71,9 +71,13 @@ const ElectionItem = ({ election, isManager }) => {
                     party: candidate.party
                 })),
                 isended: updatedData.isended,
+                minage: updatedData.voterscriteria.minage,
+                maxage: updatedData.voterscriteria.maxage,
+                city: updatedData.voterscriteria.city,
+                state: updatedData.voterscriteria.state,
                 userList: updatedData.voterscriteria.userList
             };
-            const success = await updateElectionData(backPayload, payload, isManager);
+            const success = await updateElectionData(backPayload, payload, isManager, updatedData);
             if (success) {
                 console.log('Election updated successfully');
             } else {

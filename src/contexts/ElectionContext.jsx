@@ -104,7 +104,7 @@ export const ElectionProvider = ({ children }) => {
   }, [deleteElection, deleteError]);
 
   
-  const updateElectionData = async (electionData, payload, isManager=false) => {
+  const updateElectionData = async (electionData, payload, isManager = false, updatedData) => {
     try {
       console.log("Updating election data:", electionData);
       await updateElection(electionData);
@@ -132,12 +132,12 @@ export const ElectionProvider = ({ children }) => {
       if (!updateError) {
         setElections((prevElections) =>
           prevElections.map((election) =>
-            election.id === electionData.id ? { ...election, ...electionData } : election
+            election.id === updatedData.id ? { ...election, ...updatedData } : election
           )
         );
         setDetailedElections((prevDetailedElections) =>
           prevDetailedElections.map((election) =>
-            election.id === electionData.id ? { ...election, ...electionData } : election
+            election.id === updatedData.id ? { ...election, ...updatedData } : election
           )
         );
         return true;

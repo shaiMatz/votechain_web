@@ -71,7 +71,7 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
           elections.map((election) => (
             <div
               key={election.id}
-              className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl hover:cursor-pointer transition-shadow duration-300 sm:mr-6 mb-6 flex-grow flex flex-col
+              className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl  transition-shadow duration-300 sm:mr-6 mb-6 flex-grow flex flex-col
                justify-between"
               style={{ minWidth: '275px', flexBasis: '25%', minHeight: '150px', maxWidth: `${index < 1 ? 'calc(100vw - 50vw)' : 'auto'}` }}
             >
@@ -90,23 +90,34 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
                   {election.startdate ? election.startdate : ''} to {election.enddate ? election.enddate : ''}
                 </p>
 
-                {new Date() >= new Date(election.startdate) && new Date() <= new Date(election.enddate) && !election.userHasVoted ? (
-                  <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleVoteClick(election.id)}>
-                    Let&rsquo;s vote <FaArrowRight className="ml-1" />
-                  </p>
-                ) : (
-                  election.userHasVoted ? ( // Check if the user has voted
-                    <div className="flex items-center justify-end w-full">
-                      <p className="text-md text-gray-700 bg-slate-200 py-2 px-4 rounded-lg shadow-md text-center">
-                        Coming soon...
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleResultsClick(election.id)}>
-                      Results <FaArrowRight className="ml-2" />
+                {
+                  new Date() >= new Date(election.startdate) && new Date() <= new Date(election.enddate) && !election.userHasVoted ? (
+                    <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center hover:cursor-pointer" onClick={() => handleVoteClick(election.id)}>
+                      Let&rsquo;s vote <FaArrowRight className="ml-1" />
                     </p>
+                  ) : (
+                    new Date() > new Date(election.enddate) && election.userHasVoted ? (
+                        <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center hover:cursor-pointer" onClick={() => handleResultsClick(election.id)}>
+                        Results <FaArrowRight className="ml-2" />
+                      </p>
+                    ) : (
+                      new Date() > new Date(election.enddate) ? (
+                        <div className="flex items-center justify-end w-full">
+                          <p className="text-md text-gray-700 bg-slate-200 py-2 px-4 rounded-lg shadow-md text-center">
+                            Election has ended, results coming soon...
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-end w-full">
+                          <p className="text-xs text-gray-700 bg-slate-200 py-2 px-4 rounded-lg shadow-md text-center">
+                            Voting period is still ongoing
+                          </p>
+                        </div>
+                      )
+                    )
                   )
-                )}
+                }
+
               </div>
             </div>
           ))

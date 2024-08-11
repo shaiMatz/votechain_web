@@ -7,6 +7,12 @@ import Navbar from '../components/Navbar';
 import useAuth from '../hooks/useAuth';
 import { checkIfNftUsed } from '../services/checkIfNftUsed';
 
+const Spinner = () => (
+  <div className="flex justify-center items-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-blue-500"></div>
+  </div>
+);
+
 const VoterDashboard = () => {
   const { elections, fetchElectionsByUser } = useContext(ElectionContext);
   const { user } = useAuth();
@@ -58,7 +64,7 @@ const VoterDashboard = () => {
   }, [elections, fetchElectionsByUser, user.user_id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   if (error) {

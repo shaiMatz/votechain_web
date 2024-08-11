@@ -20,7 +20,18 @@ const ResultsPage = () => {
             setElectionData(election.data);
 
             const result = await electionResult(electionId);
-            console.log(result)
+            console.log(result);
+
+            // Parse the results to extract vote counts
+            const parsedCandidates = result.candidate_results.map(candidate => ({
+                name: candidate.candidate_name,
+                votes: candidate.votes.words[0] // Extracting the vote count from the words array
+            }));
+
+            setElectionData(prevData => ({
+                ...prevData,
+                candidates: parsedCandidates
+            }));
         } catch (err) {
             setResultsError(err);
         } finally {
@@ -70,7 +81,6 @@ const ResultsPage = () => {
                                             <div className="p-6 shadow-xl border rounded text-gray-700 flex flex-col items-center border-secondary-200 mx-auto max-w-sm">
                                                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white bg-secondary-300">1</div>
                                                 <h3 className="text-2xl font-semibold text-black mt-2">{getWinner(electionData.candidates).name}</h3>
-                                                        <p className="text-lg text-gray-700">{getWinner(electionData.candidates).party}</p>
                                                 <p className="text-md text-black">Votes: {getWinner(electionData.candidates).votes}</p>
                                             </div>
                                         </div>
@@ -78,12 +88,10 @@ const ResultsPage = () => {
                                             <h3 className="text-xl font-semibold mb-6 text-black">Other Candidates</h3>
                                             <div className="space-y-4">
                                                 {getRestCandidates(electionData.candidates).map((result, index) => (
-                                                    <div key={result.id} className="p-4 bg-white  shadow-sm text-gray-700 flex items-center">
+                                                    <div key={result.name} className="p-4 bg-white  shadow-sm text-gray-700 flex items-center">
                                                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold bg-gray-300 mr-4">{index + 2}</div>
                                                         <div>
                                                             <h3 className="text-xl font-semibold text-black">{result.name}</h3>
-                                                            <p className="text-xl text-gray-700">{result.party}</p>
-
                                                             <p className="text-md text-black">Votes: {result.votes}</p>
                                                         </div>
                                                     </div>
