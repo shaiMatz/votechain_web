@@ -27,7 +27,7 @@ const HeroSection = ({ circleRef, titleRef }) => {
             className="px-6 w-64 py-3 text-secondary-100 border border-secondary-100 bg-transparent rounded-full shadow-lg hover:bg-secondary-200 hover:text-white focus:outline-none"
             onClick={handleJoinClick}
           >
-            Join the Fun
+            Login to Vote
           </button>
           <div  className="flex-grow w-full h-0.5 bg-secondary-100"></div>
           <div

@@ -185,34 +185,34 @@ const SignupForm = () => {
 				styles={{
 					control: (base) => ({
 						...base,
-						backgroundColor: 'black',
-						borderColor: '#4F46E5',
+						backgroundColor: 'white',
+						borderColor: '#7620EA',
 						minHeight: '42px',
-						'&:hover': { borderColor: '#4F46E5' },
+						'&:hover': { borderColor: '#7620EA' },
 						boxShadow: 'none',
 						borderRadius: '10px'
 					}),
 					singleValue: (base) => ({
 						...base,
-						color: 'white',
+						color: 'black',
 					}),
 					menu: (base) => ({
 						...base,
-						backgroundColor: 'black',
-						color: 'white',
+						backgroundColor: 'white',
+						color: 'black',
 					}),
 					option: (base, state) => ({
 						...base,
-						backgroundColor: state.isFocused ? '#4F46E5' : 'black',
-						color: 'white',
+						backgroundColor: state.isFocused ? '#7620EA' : 'white',
+						color: state.isFocused ? 'white' : 'black',
 					}),
 					input: (base) => ({
 						...base,
-						color: 'white',
+						color: 'black',
 					}),
 					placeholder: (base) => ({
 						...base,
-						color: 'white',
+						color: 'black',
 					}),
 				}}
 			/>
@@ -293,11 +293,15 @@ const SignupForm = () => {
 									/>
 								</div>
 							</div>
-							<div className="flex flex-col md:flex-row md:space-x-4 mb-4 md:mb-6 gap-2">
-								{renderDropdown('Day', 'day', days)}
-								{renderDropdown('Month', 'month', months)}
-								{renderDropdown('Year', 'year', years)}
+							<div className="mb-4 md:mb-6">
+								<label className="block text-sm md:text-base font-bold mb-2 text-gray-700">Birthday</label>
+								<div className="flex  md:flex-row md:space-x-4 gap-2">
+									{renderDropdown('Day', 'day', days)}
+									{renderDropdown('Month', 'month', months)}
+									{renderDropdown('Year', 'year', years)}
+								</div>
 							</div>
+
 							<div className="mb-4 md:mb-6">
 								<label className="block text-sm md:text-base font-bold mb-2 text-gray-700">Phone Number</label>
 								<input
@@ -335,14 +339,24 @@ const SignupForm = () => {
 									className="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
 								/>
 							</div>
-							<button type="button" onClick={handleNext} className="w-full bg-secondary text-white py-2 md:py-3 rounded-lg font-semibold hover:bg-secondary-200 transition duration-300">
-								Next
-							</button>
-							<div className="flex flex-col md:flex-row md:space-x-4">
-								<button type="button" onClick={handlePrevious} className="bg-gray-300 text-gray-700 py-2 md:py-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300">
+						
+							<div className="flex flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
+								<button
+									type="button"
+									onClick={handleNext}
+									className="w-full  bg-secondary text-white py-2 md:py-3 px-4 rounded-lg font-semibold hover:bg-secondary-200 transition duration-300"
+								>
+									Next
+								</button>
+								<button
+									type="button"
+									onClick={handlePrevious}
+									className="w-full  bg-gray-300 text-gray-700 py-2 md:py-3 px-4 rounded-lg font-semibold hover:bg-gray-400 transition duration-300"
+								>
 									Previous
 								</button>
 							</div>
+
 						</>
 					)}
 					{step === 3 && (

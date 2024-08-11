@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 import { createContext, useState, useCallback } from 'react';
 import { useGetElectionsByUser, useGetElectionsByEA, useDeleteElection, useGetElection, useUpdateElection } from '../api/electionService';
+import { loadContract, session } from '../services/sessionService';
+import { updateElections } from '../services/updateElection';
 
 export const ElectionContext = createContext();
 
@@ -101,25 +103,56 @@ export const ElectionProvider = ({ children }) => {
     }
   }, [deleteElection, deleteError]);
 
-  const updateElectionData = useCallback(async (electionData) => {
-    await updateElection(electionData);
-    if (!updateError) {
-      setElections((prevElections) =>
-        prevElections.map((election) =>
-          election.id === electionData.id ? { ...election, ...electionData } : election
-        )
-      );
-      setDetailedElections((prevDetailedElections) =>
-        prevDetailedElections.map((election) =>
-          election.id === electionData.id ? { ...election, ...electionData } : election
-        )
-      );
-      return true;
-    } else {
-      console.error("Error updating election:", updateError);
+  
+  const updateElectionData = async (electionData, payload, isManager=false) => {
+    try {
+      console.log("Updating election data:", electionData);
+      await updateElection(electionData);
+      const electionIdBigInt = BigInt(payload.id);
+
+      const payloadnew = {
+        ...payload,
+        election_id: electionIdBigInt,
+      };
+
+      console.log('start create in block chain1');
+
+      try {
+        console.log('start create in block chain2');
+
+        const contract = await loadContract(session);
+
+        var ans = await updateElections(session, contract, payloadnew, isManager);
+        console.log('ans:', ans);
+      } catch (error) {
+        console.error("Error in createElections:", error);
+      }
+
+      // Moved error check after the API calls
+      if (!updateError) {
+        setElections((prevElections) =>
+          prevElections.map((election) =>
+            election.id === electionData.id ? { ...election, ...electionData } : election
+          )
+        );
+        setDetailedElections((prevDetailedElections) =>
+          prevDetailedElections.map((election) =>
+            election.id === electionData.id ? { ...election, ...electionData } : election
+          )
+        );
+        return true;
+      } else {
+        console.error("Error updating election:", updateError);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error in updateElectionData:", error);
       return false;
     }
-  }, [updateElection, updateError]);
+  };
+
+
+
 
   const loading = userLoading || eaLoading || deleteLoading || electionLoading || updateLoading;
   const error = userError || eaError || deleteError || electionError || updateError;

@@ -1,10 +1,9 @@
 import { TimePointSec } from "@wharfkit/antelope";
 
-export const createElections = async (session, contract, election) => {
+export const updateElections = async (session, contract, election, manager) => {
     try {
-        console.log("Creating election with session:", session);
         if (!election) throw new Error("Election data is required.");
-        console.log("Creating election with data:", election);
+        console.log("updating election with data:", election);
 
         const startTime = TimePointSec.fromMilliseconds(new Date(election.startdate).getTime());
         const endTime = TimePointSec.fromMilliseconds(new Date(election.enddate).getTime());
@@ -15,12 +14,13 @@ export const createElections = async (session, contract, election) => {
         console.log("Formatted candidates:", formattedCandidates);
 
         const transaction = {
-            action: contract.action("createlect", {
+            action: contract.action(manager ? "updtlectmng":"updatelect", {
                 election_id: election.election_id,
-                title: election.name,
-                start_time: startTime,
-                end_time: endTime,
-                candidates: formattedCandidates,
+                new_title: election.name,
+                new_start_time: startTime,
+                new_end_time: endTime,
+                new_candidates: formattedCandidates,
+                ...(manager && { manager_code: 123 })
             }),
         };
 

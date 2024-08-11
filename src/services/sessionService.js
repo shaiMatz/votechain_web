@@ -30,14 +30,17 @@ const contractKit = new ContractKit({ client: client });
 
 const loadContract = async () => {
     try {
+        console.log("Loading contract for account:", accountName);
         const contract = await contractKit.load(accountName);
+        console.log("Contract loaded successfully:", contract);
         const actionNames = contract.actionNames;
-        console.log(actionNames);
+        console.log("Available actions:", actionNames);
         return contract;
     } catch (error) {
         console.error("An error occurred while loading the contract:", error);
         throw error;
     }
 };
+
 
 export { session, loadContract };

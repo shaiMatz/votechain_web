@@ -43,6 +43,7 @@ export const useDeleteElection = () => {
 export const useGetElectionsByUser = () => {
   const { data, loading, error, fetchData } = useAPI();
   const getElectionsByUser = useCallback(async (user_id) => {
+    user_id = parseInt(user_id);
     var res=await fetchData(`${BASE_API_URL}/get_elections_by_user`, 'POST', {user_id} );
     return res;
   }, [fetchData]);

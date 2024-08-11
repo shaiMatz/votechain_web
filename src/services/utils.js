@@ -36,7 +36,7 @@ export const isEligible = (voter, criteria, birthdateTimestamp) => {
 
     // Check if userList is present and not empty
     if (criteria.userList && criteria.userList.length > 0) {
-        if (!criteria.userList.includes(voter.user_id)) {
+        if (!criteria.userList.some(id => id === voter.user_id || id === parseInt(voter.user_id))) {
             console.log("Voter's user_id is not in the userList.");
             return false;
         }

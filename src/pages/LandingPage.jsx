@@ -1,9 +1,10 @@
 import HeroSection from '../components/HeroSection';
 import HowItWorks from '../components/HowItWorks';
 import GradientBackground from '../components/GradientBackground';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { AuthContext } from '../contexts/AuthContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,9 +13,12 @@ const LandingPage = () => {
   const circleRef = useRef(null); // This is your mark
   const titleRef = useRef(null);
   const dotRef = useRef(null);
+  const { setUser }= useContext(AuthContext);
 
+  
   useEffect(() => {
     if (!sectionRef.current || !dotRef.current || !titleRef.current) return;
+    setUser(null);
 
     // Set up the initial state of the dotRef (your mark)
     gsap.set(dotRef.current, {
@@ -60,7 +64,7 @@ const LandingPage = () => {
       {
         scale: 1,
         width: "100vw",
-        height: "100vh",
+        height: "120vh",
         x: 0,
         y: 0,
         backgroundColor: "#ffffff60",
@@ -92,7 +96,7 @@ const LandingPage = () => {
         <div ref={sectionRef}>
           <HeroSection circleRef={circleRef} titleRef={titleRef} />
         </div>
-        <div ref={dotRef} className="absolute w-0 h-0 rounded-full flex items-center justify-center overflow-hidden">
+        <div ref={dotRef} className="absolute w-0 h-0 rounded-full flex items-center justify-center overflow-hidden md:overflow-auto">
           <HowItWorks />
         </div>
       

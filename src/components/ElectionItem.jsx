@@ -54,16 +54,36 @@ const ElectionItem = ({ election, isManager }) => {
     };
 
 
-    const handleUpdate = async (updatedData) => {
-        setEditing(false);
-        updatedData.id = election.id;
-        const success = await updateElectionData(updatedData);
-        if (success) {
-            console.log('Election updated successfully');
-        } else {
-            console.error('Failed to update election');
+    const handleUpdate = async (updatedData, payload) => {
+        try {
+            setEditing(false);
+            console.log('Updated Data before:', updatedData);
+            updatedData.id = election.id;
+
+            console.log('Updated Data after:', updatedData);
+            var backPayload = {
+                id: updatedData.id,
+                name: updatedData.name,
+                startdate: updatedData.startdate,
+                enddate: updatedData.enddate,
+                candidates: updatedData.candidates.map(candidate => ({
+                    name: candidate.name,
+                    party: candidate.party
+                })),
+                isended: updatedData.isended,
+                userList: updatedData.voterscriteria.userList
+            };
+            const success = await updateElectionData(backPayload, payload, isManager);
+            if (success) {
+                console.log('Election updated successfully');
+            } else {
+                console.error('Failed to update election');
+            }
+        } catch (error) {
+            console.error('Error in handleUpdate:', error);
         }
     };
+
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);

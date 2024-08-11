@@ -1,5 +1,6 @@
 import { isEligible, hashToken } from "./utils";
 import { session, loadContract } from "./sessionService";
+import { Name } from "@wharfkit/antelope";
 
 export const mintNftToUser = async (voterObject, eligibleElections) => {
     try {
@@ -26,23 +27,50 @@ export const mintNftToUser = async (voterObject, eligibleElections) => {
         }
 
         // Batch query to check for existing NFTs
-        const electionIds = openElections.map(e => parseInt(e.id)); // Convert id to integer if needed
-        const existingNfts = await contract.table("nftstb").all({
-            scope: voterObject.username,
-            code: contract.account,
-            table: "nftstb",
-            lower_bound: Math.min(...electionIds),
-            upper_bound: Math.max(...electionIds),
-        });
+        let existingNfts;
+        try {
+            console.log("Querying all NFTs...");
+            existingNfts = await contract.table("nftstb").all({
+                code: contract.account,
+                table: "nftstb"
+            });
+            console.log("All NFTs for user:", existingNfts);
+
+            // Ensure existingNfts is defined and an array
+            if (!Array.isArray(existingNfts)) {
+                console.warn("Unexpected structure of existingNfts, expected an array.");
+                existingNfts = []; // Fallback to an empty array if it's not an array
+            }
+
+        } catch (error) {
+            console.error("Error querying existing NFTs:", error);
+            throw new Error("Failed to query existing NFTs.");
+        }
 
         console.log("Existing NFTs:", existingNfts);
 
-        // Ensure existingNfts and existingNfts.rows are defined
+        // Convert owner.value and election_id.value to strings for comparison
         const mintedElectionIds = new Set(
-            existingNfts && existingNfts.rows ? existingNfts.rows.map(nft => nft.election_id) : []
+            existingNfts.length > 0
+                ? existingNfts
+                    .filter(nft => {
+                        const ownerString = String(nft.owner); // Convert to string
+                        console.log(`Comparing owner: ${ownerString} with voter: ${voterObject.username}`);
+                        return ownerString === voterObject.username;
+                    })
+                    .map(nft => nft.election_id.value.toString()) // Convert BN to string
+                : []
         );
+        console.log("Minted Election IDs:", mintedElectionIds);
 
         for (const election of openElections) {
+            // Check if already minted
+            console.log("Checking if NFT already exists for election:", election.id);
+            if (mintedElectionIds.has(election.id.toString())) { // Convert election.id to string for comparison
+                console.log(`NFT already exists for election: ${election.id}, skipping...`);
+                continue;
+            }
+
             const birthdateTimestamp = new Date(voterObject.birthdate).getTime();
 
             // Use `voterscriteria` instead of `criteria`
@@ -57,11 +85,6 @@ export const mintNftToUser = async (voterObject, eligibleElections) => {
                 continue;
             }
 
-            if (mintedElectionIds.has(election.id)) {
-                console.log(`NFT already exists for election: ${election.id}, skipping...`);
-                continue;
-            }
-
             const unhashedToken = `${voterObject.username}${election.id}`;
             const hashedToken = await hashToken(unhashedToken);
             console.log("Token:", hashedToken);
@@ -70,7 +93,7 @@ export const mintNftToUser = async (voterObject, eligibleElections) => {
             try {
                 await session.transact({
                     action: contract.action("mintnft", {
-                        owner: voterObject.username,
+                        owner: Name.from(voterObject.username),
                         election_id: election.id,
                         hashedtoken: hashedToken,
                     }),
@@ -86,6 +109,3 @@ export const mintNftToUser = async (voterObject, eligibleElections) => {
         throw new Error("Error processing elections.");
     }
 };
-
-
-

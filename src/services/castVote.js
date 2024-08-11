@@ -1,11 +1,14 @@
 import { initializeVoterSession } from "./initializeVoterSession";
 import { verifyAndFetchTokenId } from "./verifyAndFetchTokenId";
-
+import { session } from "./sessionService";
 export const castVote = async (voter, candidate, electionId, contract, voters) => {
-    const voterObject = voters.find((v) => v.username.equals(voter));
-    if (!voterObject) {
-        throw new Error("Invalid voter.");
+    if (!voter || !candidate || !electionId || !contract || !voters) {
+        throw new Error("Invalid parameters provided.");
     }
+
+    //consvert the electionId to a number
+    electionId = parseInt(electionId);
+
 
     const allElections = await contract.table("electiontb").all();
     if (!allElections) {
@@ -16,12 +19,18 @@ export const castVote = async (voter, candidate, electionId, contract, voters) =
     if (!election) {
         throw new Error("Invalid election ID.");
     }
+    console.log("Election found:", election);
+    console.log("Voter:", voter);
+    const voterSession = await initializeVoterSession(voter);
+    const tokenId = await verifyAndFetchTokenId(voterSession, voter, election, contract);
 
-    const voterSession = await initializeVoterSession(voterObject);
-    const tokenId = await verifyAndFetchTokenId(voterSession, voterObject, election, contract);
+    console.log("Token ID:", tokenId);
+    if (!tokenId) {
+        throw new Error("Failed to fetch token ID.");
+    }
 
     try {
-        const response = await voterSession.transact({
+        const response = await session.transact({
             action: contract.action("vote", {
                 token_id: tokenId,
                 election_id: election.id,

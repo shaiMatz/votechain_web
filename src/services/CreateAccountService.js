@@ -1,4 +1,4 @@
-import { PrivateKey, APIClient } from "@wharfkit/antelope";
+import { PrivateKey } from "@wharfkit/antelope";
 import { Session } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { TransactPluginResourceProvider } from "@wharfkit/transact-plugin-resource-provider";

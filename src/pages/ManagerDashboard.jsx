@@ -293,53 +293,80 @@ const ManagerDashboard = () => {
           </select>
         </div>
 
-        <div className=" w-full overflow-x-auto">
-          <table className="min-w-full  bg-white  rounded-lg">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 text-nowrap border-b text-start"></th>
-                <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('name')}>
-                  EA Name {getSortArrow('name') && <span>{getSortArrow('name')}</span>}
-                </th>
-                <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('id')}>
-                  ID {getSortArrow('id') && <span>{getSortArrow('id')}</span>}
-                </th>
-                <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('email')}>
-                  Email {getSortArrow('email') && <span>{getSortArrow('email')}</span>}
-                </th>
-                <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('date')}>
-                  Date {getSortArrow('date') && <span>{getSortArrow('date')}</span>}
-                </th>
-                <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('user_id')}>
-                  User ID {getSortArrow('user_id') && <span>{getSortArrow('user_id')}</span>}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedEAs.map(ea => (
-                <tr key={ea.id} className="hover:bg-gray-100 transition duration-200">
-                  <td className="py-2 px-4 border-b text-center relative">
-                    <div className="relative inline-block dropdown-menu">
-                      <CiMenuKebab className="h-5 w-5 text-gray-500 cursor-pointer" onClick={(event) => handleMenuClick(ea.id, event)} />
-                      {dropdownOpen === ea.id && (
-                        <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10" onClick={(event) => event.stopPropagation()}>
-                          <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleEditClick(ea.id, event)}>Edit</button>
-                          <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleDeleteClick(ea.id, event)}>Delete</button>
-                          <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.user_id, event)}>View</button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.name}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.id}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.email}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.date}</td>
-                  <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.user_id}</td>
+        <div className="w-full">
+          {/* Display the table only on medium and larger screens */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full bg-white rounded-lg">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 text-nowrap border-b text-start"></th>
+                  <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('name')}>
+                    EA Name {getSortArrow('name') && <span>{getSortArrow('name')}</span>}
+                  </th>
+                  <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {getSortArrow('id') && <span>{getSortArrow('id')}</span>}
+                  </th>
+                  <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('email')}>
+                    Email {getSortArrow('email') && <span>{getSortArrow('email')}</span>}
+                  </th>
+                  <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('date')}>
+                    Date {getSortArrow('date') && <span>{getSortArrow('date')}</span>}
+                  </th>
+                  <th className="py-2 px-4 text-nowrap border-b text-start cursor-pointer" onClick={() => requestSort('user_id')}>
+                    User ID {getSortArrow('user_id') && <span>{getSortArrow('user_id')}</span>}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginatedEAs.map(ea => (
+                  <tr key={ea.id} className="hover:bg-gray-100 transition duration-200">
+                    <td className="py-2 px-4 border-b text-center relative">
+                      <div className="relative inline-block dropdown-menu">
+                        <CiMenuKebab className="h-5 w-5 text-gray-500 cursor-pointer" onClick={(event) => handleMenuClick(ea.id, event)} />
+                        {dropdownOpen === ea.id && (
+                          <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10" onClick={(event) => event.stopPropagation()}>
+                            <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleEditClick(ea.id, event)}>Edit</button>
+                            <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleDeleteClick(ea.id, event)}>Delete</button>
+                            <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.user_id, event)}>View</button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.name}</td>
+                    <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.id}</td>
+                    <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.email}</td>
+                    <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.date}</td>
+                    <td className="py-2 px-4 text-nowrap border-b cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>{ea.user_id}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Display the card layout only on small screens */}
+          <div className="block md:hidden">
+            {paginatedEAs.map(ea => (
+              <div key={ea.id} className="bg-white shadow-md rounded-lg mb-4 p-4 cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-semibold">{ea.name}</h3>
+                  <CiMenuKebab className="h-5 w-5 text-gray-500 cursor-pointer" onClick={(event) => handleMenuClick(ea.id, event)} />
+                  {dropdownOpen === ea.id && (
+                    <div className="absolute right-4 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
+                      <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleEditClick(ea.id, event)}>Edit</button>
+                      <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleDeleteClick(ea.id, event)}>Delete</button>
+                      <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.user_id, event)}>View</button>
+                    </div>
+                  )}
+                </div>
+                <p><strong>ID:</strong> {ea.id}</p>
+                <p><strong>Email:</strong> {ea.email}</p>
+                <p><strong>Date:</strong> {ea.date}</p>
+                <p><strong>User ID:</strong> {ea.user_id}</p>
+              </div>
+            ))}
+          </div>
         </div>
+
         {!formLoading && filteredEAs.length === 0 && (
           <p className="text-lg text-center p-3 text-red-500">No EA&apos;s available.</p>
         )}

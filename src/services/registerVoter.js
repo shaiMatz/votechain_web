@@ -1,4 +1,5 @@
 import { initializeVoterSession } from "./initializeVoterSession";
+import { Name } from "@wharfkit/antelope";
 
 export const registerVoter = async (voter, contract, session) => {
     console.log("Registering voter:", voter.username);
@@ -10,7 +11,7 @@ export const registerVoter = async (voter, contract, session) => {
 
     await voterSession.transact({
       action: contract.action("regvoter", {
-          voter: voter.username,
+          voter: Name.from(voter.username),
       }),
     });
     console.log("Voter registered successfully.");

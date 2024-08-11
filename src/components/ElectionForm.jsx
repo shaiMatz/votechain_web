@@ -169,7 +169,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
             startdate: data.startdate,
             enddate: data.enddate,
             isended: data.isended,
-            ea_id: ea_id,
+            ea_id: data.ea_id,
             candidates: data.candidates.map((candidate) => ({
                 name: candidate.name,
                 party: candidate.party,
@@ -297,22 +297,7 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                             <h2 className="text-xl md:text-2xl text-gray-700">Candidates</h2>
                         </div>
                         <div className="mb-4">
-                            {electionData.candidates && (
-                                <div className="mb-2 flex flex-col space-y-2 h-3/5 overflow-y-auto">
-                                    {electionData.candidates.map((candidate, index) => (
-                                        <div key={index} className="flex  md:flex-row items-center justify-between p-2 border border-gray-300 rounded-lg bg-transparent">
-                                            <div className="mb-0">
-                                                <p className="font-semibold text-gray-800">{candidate.name}</p>
-                                                <p className="text-sm text-gray-600">{candidate.party}</p>
-                                            </div>
-                                            <button type="button" onClick={() => handleRemoveCandidate(index)} className="text-gray-500 hover:text-red-700">
-                                                <FaTrash />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            <div className="flex mt-4 items-center space-y-2">
+                            <div className="flex mb-4 items-center space-y-2">
                                 <div className='space-y-2 lg:space-x-2'>
                                     <input
                                         type="text"
@@ -333,6 +318,24 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
                                     <FaPlus />
                                 </button>
                             </div>
+                            <div className="mb-4 max-h-72 overflow-y-auto">
+                            {electionData.candidates && (
+                                <div className="mb-2 flex flex-col space-y-2 h-3/5 overflow-y-auto">
+                                    {electionData.candidates.map((candidate, index) => (
+                                        <div key={index} className="flex  md:flex-row items-center justify-between p-2 border border-gray-300 rounded-lg bg-transparent">
+                                            <div className="mb-0">
+                                                <p className="font-semibold text-gray-800">{candidate.name}</p>
+                                                <p className="text-sm text-gray-600">{candidate.party}</p>
+                                            </div>
+                                            <button type="button" onClick={() => handleRemoveCandidate(index)} className="text-gray-500 hover:text-red-700">
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            </div>
+                        
                             {errors.candidates && <p className="text-red-500 text-sm">{errors.candidates}</p>}
                         </div>
                     </div>

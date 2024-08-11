@@ -90,19 +90,23 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
                   {election.startdate ? election.startdate : ''} to {election.enddate ? election.enddate : ''}
                 </p>
 
-                {new Date() >= new Date(election.startdate) && new Date() <= new Date(election.enddate) ? (
+                {new Date() >= new Date(election.startdate) && new Date() <= new Date(election.enddate) && !election.userHasVoted ? (
                   <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleVoteClick(election.id)}>
                     Let&rsquo;s vote <FaArrowRight className="ml-1" />
                   </p>
                 ) : (
-                  election.isended ? (
+                  election.userHasVoted ? ( // Check if the user has voted
+                    <div className="flex items-center justify-end w-full">
+                      <p className="text-md text-gray-700 bg-slate-200 py-2 px-4 rounded-lg shadow-md text-center">
+                        Coming soon...
+                      </p>
+                    </div>
+                  ) : (
                     <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center" onClick={() => handleResultsClick(election.id)}>
                       Results <FaArrowRight className="ml-2" />
                     </p>
-                  ) : null
+                  )
                 )}
-
-
               </div>
             </div>
           ))
