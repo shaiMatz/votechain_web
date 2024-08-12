@@ -37,10 +37,10 @@ const EAPage = () => {
                     }
                 } catch (error) {
                     console.error('Error fetching data:', error);
-                    Navigate('/404');
+                    Navigate('/');
                 }
             } else {
-                Navigate('/404');
+                Navigate('/');
             }
         };
         fetchEData();
