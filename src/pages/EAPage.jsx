@@ -37,8 +37,9 @@ const EAPage = () => {
                     }
                 } catch (error) {
                     console.error('Error fetching data:', error);
+                    Navigate('/404');
                 }
-            }else{
+            } else {
                 Navigate('/404');
             }
         };
@@ -61,12 +62,12 @@ const EAPage = () => {
     const confirmDeleteElection = async () => {
         if (electionToDelete) {
             console.log("Deleting Election:" + electionToDelete);
-            var res= await deleteElection(electionToDelete)
-            if(res.error_code === 0){
-            setElectionToDelete(null);
-            console.log("Election Deleted," + electionToDelete);
+            var res = await deleteElection(electionToDelete)
+            if (res.error_code === 0) {
+                setElectionToDelete(null);
+                console.log("Election Deleted," + electionToDelete);
             }
-            else{
+            else {
                 console.log("Election Not Deleted," + electionToDelete);
             }
 
@@ -89,7 +90,7 @@ const EAPage = () => {
 
 
     return (
-        <div  className="p-4 md:p-10 min-h-screen">
+        <div className="p-4 md:p-10 min-h-screen">
             <Navbar />
             <div className="mt-6 px-6">
                 <h2 className="text-2xl font-bold text-primary mb-4">Election Administrator Details</h2>
@@ -108,7 +109,7 @@ const EAPage = () => {
                 onSearchChange={handleSearchChange}
                 filter={filter}
                 onFilterChange={handleFilterChange}
-                ea_id={managerData?.id? managerData.id : null}
+                ea_id={managerData?.id ? managerData.id : null}
             />
             <div className="mt-6 px-6">
                 <h2 className="text-2xl font-bold text-primary mb-4">Elections</h2>
@@ -121,7 +122,7 @@ const EAPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {!loading && !error && elections && filteredElections.length > 0 ? (
                         filteredElections.map((election) => (
-                            <ElectionItem key={election.id} election={election} onDelete={handleDeleteElection} isManager={true}/>
+                            <ElectionItem key={election.id} election={election} onDelete={handleDeleteElection} isManager={true} />
                         ))
                     ) : (
                         <p className="text-lg text-gray-700">No elections available.</p>
