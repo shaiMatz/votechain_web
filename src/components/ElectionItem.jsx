@@ -67,8 +67,8 @@ const ElectionItem = ({ election, isManager }) => {
                 startdate: updatedData.startdate,
                 enddate: updatedData.enddate,
                 candidates: updatedData.candidates.map(candidate => ({
-                    name: candidate.name,
-                    party: candidate.party
+                    name: candidate.name? candidate.name : null,
+                    party: candidate.party? candidate.party : null
                 })),
                 isended: updatedData.isended,
                 minage: updatedData.voterscriteria.minage,

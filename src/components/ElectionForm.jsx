@@ -181,8 +181,8 @@ const ElectionForm = ({ Data, onCreate, loading, error, id }) => {
             isended: data.isended,
             ea_id: ea_id && ea_id!=0 ?ea_id:data.ea_id,
             candidates: data.candidates.map((candidate) => ({
-                name: candidate.name,
-                party: candidate.party,
+                name: candidate.name? "":candidate.name,
+                party: candidate.party? "":candidate.party,
             })),
             voterscriteria: {
                 minage: parseInt(data.minage, 10),

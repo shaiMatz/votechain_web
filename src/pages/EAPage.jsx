@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useGetManager } from '../api/EAService';
 import Navbar from '../components/Navbar';
 import ElectionActions from '../components/ElectionActions';
@@ -38,6 +38,8 @@ const EAPage = () => {
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
+            }else{
+                Navigate('/404');
             }
         };
         fetchEData();
