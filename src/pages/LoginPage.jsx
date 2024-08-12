@@ -19,7 +19,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-console.log('credentials', credentials);
+      console.log('credentials', credentials);
     // Validate the ID before submitting
     const { isValid, id } = isValidIsraeliID(credentials.user_id);
     if (!isValid) {
