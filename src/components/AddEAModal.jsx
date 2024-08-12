@@ -2,6 +2,7 @@
 import { useState, useContext } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { EAContext } from '../contexts/EAContext';
+import { isValidIsraeliID } from '../services/isValidIsraeliID';
 
 const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
     const [fullname, setFullname] = useState(editData ? editData.name : '');
@@ -30,8 +31,11 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
 
     const validateInputs = () => {
         const errors = {};
-        if (!userId) errors.userId = 'User ID is required';
-        if (!fullname) errors.fullname = 'Full name is required';
+        if (!userId) {
+            errors.userId = 'User ID is required';
+        } else if (!isValidIsraeliID(userId)) {
+            errors.userId = 'Invalid User ID';
+        }        if (!fullname) errors.fullname = 'Full name is required';
         if (!email) {
             errors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(email)) {
