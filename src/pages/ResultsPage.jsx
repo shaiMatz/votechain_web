@@ -21,11 +21,12 @@ const ResultsPage = () => {
 
             const result = await electionResult(electionId);
             console.log(result);
-
+            console.log(result.candidate_results);
+            console.log(result.candidate_results[0].candidate_name);
             // Parse the results to extract vote counts
             const parsedCandidates = result.candidate_results.map(candidate => ({
                 name: candidate.candidate_name,
-                votes: candidate.votes.words[0] // Extracting the vote count from the words array
+                votes: candidate.votes.value.words[0] // Extracting the vote count from the words array
             }));
 
             setElectionData(prevData => ({
@@ -44,18 +45,26 @@ const ResultsPage = () => {
     }, [fetchResults]);
 
     const getWinner = (candidates) => {
-        return candidates.sort((a, b) => b.votes - a.votes)[0];
-    }
+        const sortedCandidates = candidates.sort((a, b) => b.votes - a.votes);
+        const topVotes = sortedCandidates[0]?.votes;
+        const winners = sortedCandidates.filter(candidate => candidate.votes === topVotes);
 
+        if (winners.length > 1) {
+            return { isTie: true, winners };
+        }
+        return { isTie: false, winner: sortedCandidates[0] };
+    }
     const getRestCandidates = (candidates) => {
-        return candidates.sort((a, b) => b.votes - a.votes).slice(1);
+        return candidates.sort((a, b) => b?.votes - a?.votes).slice(1);
     }
 
     const chartData = electionData?.candidates.map((candidate, index) => ({
         name: candidate.name,
-        votes: candidate.votes,
+        votes: candidate?.votes,
         rank: index + 1
     }));
+
+    const { isTie, winner, winners } = getWinner(electionData?.candidates || []);
 
     return (
         <div className="p-4 md:p-10 min-h-screen">
@@ -77,18 +86,30 @@ const ResultsPage = () => {
                                 {electionData && electionData.candidates ? (
                                     <>
                                         <div className="mt-8 text-center">
-                                            <h3 className="text-2xl font-bold mb-4 text-black">Winner</h3>
-                                            <div className="p-6 shadow-xl border rounded text-gray-700 flex flex-col items-center border-secondary-200 mx-auto max-w-sm">
-                                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white bg-secondary-300">1</div>
-                                                <h3 className="text-2xl font-semibold text-black mt-2">{getWinner(electionData.candidates).name}</h3>
-                                                <p className="text-md text-black">Votes: {getWinner(electionData.candidates).votes}</p>
-                                            </div>
+                                            <h3 className="text-2xl font-bold mb-4 text-black">{isTie ? 'Tie!' : 'Winner'}</h3>
+                                            {isTie ? (
+                                                <div>
+                                                    {winners.map((winner, index) => (
+                                                        <div key={index} className="p-6 shadow-xl border rounded text-gray-700 flex flex-col items-center border-secondary-200 mx-auto max-w-sm mb-4">
+                                                            <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white bg-secondary-300">{index + 1}</div>
+                                                            <h3 className="text-2xl font-semibold text-black mt-2">{winner.name}</h3>
+                                                            <p className="text-md text-black">Votes: {winner.votes}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="p-6 shadow-xl border rounded text-gray-700 flex flex-col items-center border-secondary-200 mx-auto max-w-sm">
+                                                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white bg-secondary-300">1</div>
+                                                    <h3 className="text-2xl font-semibold text-black mt-2">{winner.name}</h3>
+                                                    <p className="text-md text-black">Votes: {winner.votes}</p>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="mt-12">
                                             <h3 className="text-xl font-semibold mb-6 text-black">Other Candidates</h3>
                                             <div className="space-y-4">
-                                                {getRestCandidates(electionData.candidates).map((result, index) => (
-                                                    <div key={result.name} className="p-4 bg-white  shadow-sm text-gray-700 flex items-center">
+                                                {getRestCandidates(electionData.candidates, winners.map(w => w.name)).map((result, index) => (
+                                                    <div key={result.name} className="p-4 bg-white shadow-sm text-gray-700 flex items-center">
                                                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold bg-gray-300 mr-4">{index + 2}</div>
                                                         <div>
                                                             <h3 className="text-xl font-semibold text-black">{result.name}</h3>
@@ -99,7 +120,7 @@ const ResultsPage = () => {
                                             </div>
                                         </div>
                                         <div className="mt-12">
-                                            <h3 className="text-xl font-semibold mb-6 text-black">Election Results Chart</h3>
+                                            <h3 className="text-xl font-semibold mb-6 text-black text-center">Election Results Chart</h3>
                                             <ResponsiveContainer width="100%" height={400}>
                                                 <BarChart data={chartData} layout="vertical">
                                                     <CartesianGrid strokeDasharray="3 3" />
@@ -107,7 +128,7 @@ const ResultsPage = () => {
                                                     <YAxis dataKey="name" type="category" />
                                                     <Tooltip />
                                                     <Legend />
-                                                    <Bar dataKey="votes" fill="#8884d8" />
+                                                    <Bar dataKey="votes" fill="#09ACFE" />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
