@@ -17,6 +17,7 @@ import ResultsPage from '../pages/ResultsPage';
 import { EAProvider } from '../contexts/EAContext';
 import { ModalProvider } from '../contexts/ModalContext';
 import NotFoundPage from '../pages/NotFoundPage';
+import { Analytics } from "@vercel/analytics/react"
 
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
