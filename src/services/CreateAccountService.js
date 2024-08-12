@@ -8,7 +8,7 @@ import { Name } from "@wharfkit/antelope";
 
 const createEOSAccount = async (username, adminPrivateKey) => {
   try {
-    
+    console.log("Creating account for:", username);
     // Generate keys
     const privateKey = PrivateKey.generate("K1");
     const publicKey = privateKey.toPublic();

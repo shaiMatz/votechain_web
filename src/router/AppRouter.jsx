@@ -16,6 +16,8 @@ import VotePage from '../pages/VotePage';
 import ResultsPage from '../pages/ResultsPage';
 import { EAProvider } from '../contexts/EAContext';
 import { ModalProvider } from '../contexts/ModalContext';
+import NotFoundPage from '../pages/NotFoundPage';
+
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
 
@@ -34,7 +36,8 @@ const AppRouter = () => {
       <Route path="/vote/:electionId" element={<VotePage />} />
       <Route path="/results/:electionId" element={<ResultsPage />} />
       <Route path="/ea/:eaId" element={<EAPage />} />
-
+      {/* 404 Route */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
