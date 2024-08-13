@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { EAContext } from '../contexts/EAContext';
 import { isValidIsraeliID } from '../services/isValidIsraeliID';
@@ -13,14 +13,24 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
     const [errors, setErrors] = useState({});
     const { error } = useContext(EAContext);
     const [loading, setLoading] = useState(false); // Add loading state
+    const [validId, setValidId] = useState(null);
+
+    useEffect(() => {
+        if (validId !== null) {
+            // This code runs after `validId` is updated and the DOM has re-rendered
+            console.log('DOM has been updated with validId:', validId);
+        }
+    }, [validId]); // Only runs when `validId` changes
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validateInputs();
+        console.log('Validation errors:', validationErrors);
         if (Object.keys(validationErrors).length === 0) {
             setLoading(true); // Set loading to true when submission starts
+            console.log('Submitting form... validId:', validId);
             try {
-                await onSubmit({ fullname, email, password, user_id: userId, id: editData ? editData.id : undefined, date });
+                await onSubmit({ fullname, email, password, user_id: validId, id: editData ? editData.id : undefined, date });
             } finally {
                 setLoading(false); // Set loading to false once submission is done
             }
@@ -33,9 +43,14 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
         const errors = {};
         if (!userId) {
             errors.userId = 'User ID is required';
-        } else if (!isValidIsraeliID(userId)) {
+        }
+        const {isValid, id} = isValidIsraeliID(userId);
+        if (!isValid) {
             errors.userId = 'Invalid User ID';
-        }        if (!fullname) errors.fullname = 'Full name is required';
+        }else{
+            setValidId(id)
+        }     
+           if (!fullname) errors.fullname = 'Full name is required';
         if (!email) {
             errors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -48,8 +63,8 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-12 shadow-lg max-w-lg mx-auto relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center h-[100dvh] z-50">
+            <div className="bg-white rounded-lg p-12 shadow-lg max-w-xs md:max-w-lg lg:max-w-2xl mx-auto relative">
                 <button
                     type="button"
                     onClick={onClose}
@@ -69,6 +84,7 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
                             onChange={(e) => setUserId(e.target.value)}
                             className="w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                             required
+                            disabled={editData} // Disable input for existing EAs
                         />
                         {errors.userId && <p className="text-red-500 text-sm">{errors.userId}</p>}
                     </div>

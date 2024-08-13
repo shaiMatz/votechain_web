@@ -27,8 +27,8 @@ const AddElectionModal = ({ Data, isOpen, onRequestClose, onCreate, loading, err
             isOpen={isOpen}
             onRequestClose={onRequestClose}
             contentLabel="Add Election Modal"
-            className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75"
-            overlayClassName="fixed inset-0 bg-gray-800 bg-opacity-75"
+            className="fixed inset-0 flex items-center justify-center h-[100dvh]  bg-gray-800 bg-opacity-75"
+            overlayClassName="fixed inset-0 bg-gray-800 bg-opacity-75 h-[100dvh] "
         >
             <div className="bg-white p-8 md:p-8 rounded-lg relative w-full max-w-xs md:max-w-lg lg:max-w-2xl h-full max-h-[70vh] overflow-auto">
                 <button

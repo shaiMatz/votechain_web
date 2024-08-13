@@ -21,7 +21,7 @@ const Modal = ({ title, content, onClose, onConfirm, buttonclass, confirmDisable
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 h-[100dvh]  bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div ref={ref} className={`bg-white rounded-lg p-6 md:p-8 shadow-lg ${getModalSizeClass()} mx-auto relative`}>
                
                 <div className='flex justify-between items-start mb-4'>

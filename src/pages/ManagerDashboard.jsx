@@ -57,9 +57,12 @@ const ManagerDashboard = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownOpen && !event.target.closest('.dropdown-menu')) {
-        setDropdownOpen(null);
+      // Check if the click was inside the dropdown menu or its children
+      if (dropdownOpen && event.target.closest('.dropdown-menu')) {
+        return;
       }
+      // Close the dropdown if the click was outside
+      setDropdownOpen(null);
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -67,6 +70,7 @@ const ManagerDashboard = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownOpen]);
+
 
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
@@ -274,7 +278,7 @@ const ManagerDashboard = () => {
       <div className="p-6 h-full">
         <h2 className="text-2xl font-bold mb-4">Manage EAs</h2>
 
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 flex-wrap space-y-2 ">
           <input
             type="text"
             placeholder="Search by EA name, email, user ID"
@@ -285,7 +289,7 @@ const ManagerDashboard = () => {
           <select
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
-            className="border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-gray-300 transition duration-200 bg-transparent outline-none text-gray-800"
+            className="border border-gray-300 rounded px-3  py-2 shadow-sm focus:ring-2 focus:ring-gray-300 transition duration-200 bg-transparent outline-none text-gray-800"
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -295,7 +299,7 @@ const ManagerDashboard = () => {
 
         <div className="w-full">
           {/* Display the table only on medium and larger screens */}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:block ">
             <table className="min-w-full bg-white rounded-lg">
               <thead>
                 <tr>
@@ -349,6 +353,7 @@ const ManagerDashboard = () => {
               <div key={ea.id} className="bg-white shadow-md rounded-lg mb-4 p-4 cursor-pointer" onClick={() => handleRowClick(ea.user_id)}>
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold">{ea.name}</h3>
+                  <div className="relative inline-block dropdown-menu">
                   <CiMenuKebab className="h-5 w-5 text-gray-500 cursor-pointer" onClick={(event) => handleMenuClick(ea.id, event)} />
                   {dropdownOpen === ea.id && (
                     <div className="absolute right-4 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
@@ -357,6 +362,7 @@ const ManagerDashboard = () => {
                       <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={(event) => handleViewClick(ea.user_id, event)}>View</button>
                     </div>
                   )}
+                  </div>
                 </div>
                 <p><strong>ID:</strong> {ea.id}</p>
                 <p><strong>Email:</strong> {ea.email}</p>
@@ -418,7 +424,7 @@ const ManagerDashboard = () => {
       {isAddEaModalOpen && (
         <AddEAModal
           isOpen={isAddEaModalOpen}
-          onClose={() => {setIsAddEaModalOpen(false); setEditEaData(null);}}
+          onClose={() => {setIsAddEaModalOpen(false); setEditEaData(null); setError('');}}
           onSubmit={editEaData ? handleUpdate : handleCreateEA}
           editData={editEaData} // Correctly pass editEaData instead of editData
         />
