@@ -5,6 +5,7 @@ import useGsapAnimation from '../hooks/useGsapAnimation';
 import AddElectionModal from './AddElectionModal';
 import { ModalContext } from '../contexts/ModalContext';
 import { ElectionContext } from '../contexts/ElectionContext';
+import { useNavigate } from 'react-router-dom';
 
 const ElectionItem = ({ election, isManager }) => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -12,8 +13,10 @@ const ElectionItem = ({ election, isManager }) => {
     const menuRef = useRef(null);
     const { openModal, closeModal } = useContext(ModalContext);
     const { handleDeleteElection, updateElectionData,loading,error } = useContext(ElectionContext); // Use handleDeleteElection and updateElectionData from context
+    const navigate = useNavigate();
 
-    const handleDelete = () => {
+    const handleDelete = (event) => {
+        event.stopPropagation(); 
         openModal({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this election? This action cannot be undone.',
@@ -38,21 +41,23 @@ const ElectionItem = ({ election, isManager }) => {
         });
     };
 
-    const toggleMenu = () => {
+    const toggleMenu = (event) => {
+        event.stopPropagation(); // Stop the click event from bubbling up to the parent
         setMenuOpen(!menuOpen);
     };
 
     const handleClickOutside = (event) => {
+        event.stopPropagation(); // Stop the click event from bubbling up to the parent
         if (menuRef.current && !menuRef.current.contains(event.target)) {
             setMenuOpen(false);
         }
     };
 
-    const handleEditToggle = () => {
+    const handleEditToggle = (event) => {
+        event.stopPropagation(); // Stop the click event from bubbling up to the parent
         setEditing(true);
         setMenuOpen(false);
     };
-
 
     const handleUpdate = async (updatedData, payload) => {
         try {
@@ -119,9 +124,12 @@ const ElectionItem = ({ election, isManager }) => {
     } else {
         statusLabel = 'Upcoming';
     }
-
+    const handleResultsClick = (electionId) => {
+        console.log('Election ID:', electionId);
+        navigate(`/results/${electionId}`);
+    };
     return (
-        <div ref={animationRef} className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative">
+        <div ref={animationRef} onClick={() => handleResultsClick(election.id)} className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer duration-300 relative">
             <div className="flex justify-between items-center">
                 <div className="flex gap-3 items-center w-full">
                     <h3 className="text-gray-900 text-lg md:text-xl font-bold">{election.name}</h3>

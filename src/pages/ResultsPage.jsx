@@ -1,16 +1,19 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom'; // Make sure this import is present
 import { useGetElection } from '../api/electionService';
 import Navbar from '../components/Navbar';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { electionResult } from '../services/electionResult';
 
 const ResultsPage = () => {
+    
+    
     const { electionId } = useParams();
     const [electionData, setElectionData] = useState(null);
     const [resultsLoading, setResultsLoading] = useState(true);
     const [resultsError, setResultsError] = useState(null);
     const { getElection } = useGetElection();
+
 
     const fetchResults = useCallback(async () => {
         setResultsLoading(true); // Start loading
@@ -23,15 +26,22 @@ const ResultsPage = () => {
             console.log(result);
             console.log(result.candidate_results);
             console.log(result.candidate_results[0].candidate_name);
-            // Parse the results to extract vote counts
-            const parsedCandidates = result.candidate_results.map(candidate => ({
+
+            // Check if result.candidate_results exists and is an array before mapping
+            const parsedCandidates = Array.isArray(result.candidate_results) ? result.candidate_results.map(candidate => ({
                 name: candidate.candidate_name,
                 votes: candidate.votes.value.words[0] // Extracting the vote count from the words array
-            }));
+            })) : [];
+
+            // Ensure all candidates have a vote count, set to 0 if not present
+            const allCandidates = election.data.candidates.map(candidate => {
+                const existingCandidate = parsedCandidates.find(c => c.name === candidate.name);
+                return existingCandidate ? existingCandidate : { name: candidate.name, votes: 0 };
+            });
 
             setElectionData(prevData => ({
                 ...prevData,
-                candidates: parsedCandidates
+                candidates: allCandidates
             }));
         } catch (err) {
             setResultsError(err);
@@ -40,25 +50,27 @@ const ResultsPage = () => {
         }
     }, [electionId, getElection]);
 
+
     useEffect(() => {
         fetchResults();
     }, [fetchResults]);
 
     const getWinner = (candidates) => {
-        const sortedCandidates = candidates.sort((a, b) => b.votes - a.votes);
-        const topVotes = sortedCandidates[0]?.votes;
-        const winners = sortedCandidates.filter(candidate => candidate.votes === topVotes);
+        const sortedCandidates = candidates?.sort((a, b) => b.votes - a.votes);
+        const topVotes = sortedCandidates?.[0]?.votes;
+        const winners = sortedCandidates?.filter(candidate => candidate.votes === topVotes);
 
-        if (winners.length > 1) {
+        if (winners?.length > 1) {
             return { isTie: true, winners };
         }
-        return { isTie: false, winner: sortedCandidates[0] };
-    }
-    const getRestCandidates = (candidates) => {
-        return candidates.sort((a, b) => b?.votes - a?.votes).slice(1);
+        return { isTie: false, winner: sortedCandidates?.[0] };
     }
 
-    const chartData = electionData?.candidates.map((candidate, index) => ({
+    const getRestCandidates = (candidates) => {
+        return candidates?.sort((a, b) => b?.votes - a?.votes).slice(1);
+    }
+
+    const chartData = electionData?.candidates?.map((candidate, index) => ({
         name: candidate.name,
         votes: candidate?.votes,
         rank: index + 1
@@ -108,7 +120,7 @@ const ResultsPage = () => {
                                         <div className="mt-12">
                                             <h3 className="text-xl font-semibold mb-6 text-black">Other Candidates</h3>
                                             <div className="space-y-4">
-                                                {getRestCandidates(electionData.candidates, winners.map(w => w.name)).map((result, index) => (
+                                                {getRestCandidates(electionData.candidates).map((result, index) => (
                                                     <div key={result.name} className="p-4 bg-white shadow-sm text-gray-700 flex items-center">
                                                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold bg-gray-300 mr-4">{index + 2}</div>
                                                         <div>
@@ -119,9 +131,9 @@ const ResultsPage = () => {
                                                 ))}
                                             </div>
                                         </div>
-                                        <div className="mt-12">
+                                        <div className="mt-12 ">
                                             <h3 className="text-xl font-semibold mb-6 text-black text-center">Election Results Chart</h3>
-                                            <ResponsiveContainer width="100%" height={400}>
+                                            <ResponsiveContainer width="100%" height={500}>
                                                 <BarChart data={chartData} layout="vertical">
                                                     <CartesianGrid strokeDasharray="3 3" />
                                                     <XAxis type="number" />

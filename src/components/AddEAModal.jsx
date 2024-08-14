@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { EAContext } from '../contexts/EAContext';
 import { isValidIsraeliID } from '../services/isValidIsraeliID';
@@ -13,14 +13,7 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
     const [errors, setErrors] = useState({});
     const { error } = useContext(EAContext);
     const [loading, setLoading] = useState(false); // Add loading state
-    const [validId, setValidId] = useState(null);
 
-    useEffect(() => {
-        if (validId !== null) {
-            // This code runs after `validId` is updated and the DOM has re-rendered
-            console.log('DOM has been updated with validId:', validId);
-        }
-    }, [validId]); // Only runs when `validId` changes
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,9 +21,9 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
         console.log('Validation errors:', validationErrors);
         if (Object.keys(validationErrors).length === 0) {
             setLoading(true); // Set loading to true when submission starts
-            console.log('Submitting form... validId:', validId);
+            
             try {
-                await onSubmit({ fullname, email, password, user_id: validId, id: editData ? editData.id : undefined, date });
+                await onSubmit({ fullname, email, password, user_id: isValidIsraeliID(userId).id, id: editData ? editData.id : undefined, date });
             } finally {
                 setLoading(false); // Set loading to false once submission is done
             }
@@ -41,15 +34,13 @@ const AddEAModal = ({ isOpen, onClose, onSubmit, editData }) => {
 
     const validateInputs = () => {
         const errors = {};
-        if (!userId) {
-            errors.userId = 'User ID is required';
+        if (!editData) {
+            if (!userId) {
+                errors.userId = 'User ID is required';
+            } else if (!isValidIsraeliID(userId).isValid) {
+                errors.userId = 'Invalid User ID';
+            }
         }
-        const {isValid, id} = isValidIsraeliID(userId);
-        if (!isValid) {
-            errors.userId = 'Invalid User ID';
-        }else{
-            setValidId(id)
-        }     
            if (!fullname) errors.fullname = 'Full name is required';
         if (!email) {
             errors.email = 'Email is required';
