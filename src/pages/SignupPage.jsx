@@ -158,8 +158,9 @@ const SignupForm = () => {
 						eosAccount = await createEOSAccount(username, ADMINPRIVATEKEY);
 						break;
 					} catch (error) {
-						if (error.message.includes("name is already taken")) {
-							username = generateUsername();
+						if (error.message.includes("name is already taken") ||
+							error.message.includes("only suffix may create this account")) {
+							username = generateUsername(); // Generate a new username
 							retries++;
 						} else {
 							throw error;
