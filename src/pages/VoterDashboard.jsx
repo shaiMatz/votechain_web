@@ -35,12 +35,17 @@ const VoterDashboard = () => {
             };
           })
         );
+        const currentDate = new Date();
 
         setUpcomingElections(
-          updatedElections.filter(election => !election.isended && !election.userHasVoted)
+          updatedElections.filter(election =>
+            new Date(election.enddate) > currentDate && !election.userHasVoted
+          )
         );
         setClosedElections(
-          updatedElections.filter(election => election.isended || election.userHasVoted)
+          updatedElections.filter(election =>
+            new Date(election.enddate) <= currentDate || election.userHasVoted
+          )
         );
       } catch (err) {
         console.error("Error checking voted elections:", err);

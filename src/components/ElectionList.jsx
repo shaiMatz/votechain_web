@@ -25,7 +25,7 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
     }
   };
 
-  const getStatusTag = (startDate, endDate) => {
+  const getStatusTag = (startDate, endDate,isvoted) => {
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -35,8 +35,10 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
 
     let statusLabel = '';
     let bgColor = '';
-
-    if (isEnded) {
+    if (isvoted) {
+      statusLabel = 'Voted';
+      bgColor = 'bg-pink-200 text-pink-800';
+    } else if (isEnded) {
       statusLabel = 'Ended';
       bgColor = 'bg-red-200 text-red-800';
     } else if (isStarted) {
@@ -77,7 +79,7 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-2xl mr-3 font-semibold text-gray-900">{election.name}</h3>
-                  {getStatusTag(election.startdate, election.enddate)}
+                  {getStatusTag(election.startdate, election.enddate,election.userHasVoted)}
                 </div>
 
                 <p className="text-lg text-gray-700 flex items-center">
@@ -94,12 +96,12 @@ const ElectionList = ({ title, description, elections = [], noElectionMessage })
                     Let&rsquo;s vote <FaArrowRight className="ml-1" />
                   </p>
                 ) : (
-                  new Date() > new Date(election.enddate) && election.userHasVoted ? (
+                  new Date() > new Date(election.enddate) ? (
                     <p className="text-md text-pink-600 hover:font-bold hover:underline flex items-center hover:cursor-pointer" onClick={() => handleResultsClick(election.id)}>
                       Results <FaArrowRight className="ml-2" />
                     </p>
                   ) : (
-                    new Date() > new Date(election.enddate) ? (
+                        new Date() > new Date(election.enddate) && election.userHasVoted ? (
                       <div className="flex items-center justify-end w-full">
                         <p className="text-md text-gray-700 bg-slate-200 py-2 px-4 rounded-lg shadow-md text-center">
                           Election has ended, results coming soon...

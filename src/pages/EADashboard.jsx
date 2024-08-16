@@ -47,11 +47,17 @@ const EADashboard = () => {
 
   const filteredElections = elections.filter((election) => {
     const matchesSearch = election.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const currentDate = new Date();
+    const electionEndDate = new Date(election.enddate); // Assuming 'enddate' is the field representing the end date
+
     const matchesFilter = filter === 'all' ||
-      (filter === 'active' && !election.isended) ||
-      (filter === 'ended' && election.isended);
+      (filter === 'active' && electionEndDate > currentDate) ||
+      (filter === 'ended' && electionEndDate <= currentDate);
+
     return matchesSearch && matchesFilter;
   });
+
 
   return (
     <div  className="p-4 md:p-10 min-h-screen">
