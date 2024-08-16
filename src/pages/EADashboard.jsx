@@ -14,6 +14,7 @@ const EADashboard = () => {
   const [filter, setFilter] = useState('all');
   const { isEAModalOpen, modalProps, closeModal } = useContext(ModalContext);
 
+
   useEffect(() => {
     const fetchData = async () => {
       if (user && user.id) {

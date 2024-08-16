@@ -20,22 +20,20 @@ const AddElectionModal = ({ Data, isOpen, onRequestClose, onCreate, loading, err
         }
     }, [isOpen]);
 
-    const handleModalContentClick = (event) => {
-        event.stopPropagation(); // Prevent propagation to avoid unwanted navigation or closure
-    };
-
     return (
         <Modal
             isOpen={isOpen}
             onRequestClose={onRequestClose}
             contentLabel="Add Election Modal"
-            className="fixed inset-0 flex items-center justify-center h-[100dvh]  bg-gray-800 bg-opacity-75"
-            overlayClassName="fixed inset-0 bg-gray-800 bg-opacity-75 h-[100dvh] "
+            className="fixed inset-0 flex items-center justify-center"
+            overlayClassName="fixed inset-0 bg-gray-800 bg-opacity-75"
+            onClick={onRequestClose} // Close modal when clicking on backdrop
         >
             <div
                 className="bg-white p-8 md:p-8 rounded-lg relative w-full max-w-xs md:max-w-lg lg:max-w-2xl h-full max-h-[70vh] overflow-auto"
-                onClick={handleModalContentClick} // Stop propagation on modal content click
-            >                <button
+                onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+            >
+                <button
                     onClick={onRequestClose}
                     className="absolute top-2 right-2 text-gray-700 hover:text-gray-900"
                     aria-label="Close modal"
@@ -46,7 +44,6 @@ const AddElectionModal = ({ Data, isOpen, onRequestClose, onCreate, loading, err
             </div>
         </Modal>
     );
-
 };
 
 export default AddElectionModal;

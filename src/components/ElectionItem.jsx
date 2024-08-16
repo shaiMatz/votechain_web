@@ -80,6 +80,7 @@ const ElectionItem = ({ election, isManager }) => {
                 maxage: updatedData.voterscriteria.maxage,
                 city: updatedData.voterscriteria.city,
                 state: updatedData.voterscriteria.state,
+                country: updatedData.voterscriteria.country,
                 userList: updatedData.voterscriteria.userList
             };
             const success = await updateElectionData(backPayload, payload, isManager, updatedData);
@@ -124,12 +125,17 @@ const ElectionItem = ({ election, isManager }) => {
     } else {
         statusLabel = 'Upcoming';
     }
-    const handleResultsClick = (electionId) => {
-        console.log('Election ID:', electionId);
+    const handleResultsClick = (electionId, event) => {
+        if (editing) {
+            // If the modal is open, prevent navigation
+            return;
+        }
+        event.stopPropagation();
         navigate(`/results/${electionId}`);
     };
     return (
-        <div ref={animationRef} onClick={() => handleResultsClick(election.id)} className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer duration-300 relative">
+        <div ref={animationRef} onClick={(event) => handleResultsClick(election.id, event)}
+className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer duration-300 relative">
             <div className="flex justify-between items-center">
                 <div className="flex gap-3 items-center w-full">
                     <h3 className="text-gray-900 text-lg md:text-xl font-bold">{election.name}</h3>
@@ -180,8 +186,8 @@ const ElectionItem = ({ election, isManager }) => {
                     isOpen={editing}
                     onRequestClose={() => setEditing(false)}
                     onCreate={handleUpdate}
-                    loading={loading} // Replace with actual loading state if necessary
-                    error={error} // Replace with actual error state if necessary
+                    loading={loading}
+                    error={error}
                 />
             )}
         </div>

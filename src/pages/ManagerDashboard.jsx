@@ -10,7 +10,7 @@ import { IoTrash, IoAdd, IoChevronBack, IoChevronForward } from 'react-icons/io5
 import { RxDoubleArrowRight, RxDoubleArrowLeft } from "react-icons/rx";
 import { clearTables } from '../services/clearTables';
 import { loadContract, session } from '../services/sessionService';
-import { getRAM } from '../services/getRAM';
+import { getRAM, delegate } from '../services/getRAM';
 import { useCreateManager, useGetEAList, useDeleteManager, useUpdateManager } from '../api/EAService';
 import { ADMINPASSWORD } from '../config';
 const ManagerDashboard = () => {
@@ -34,7 +34,7 @@ const ManagerDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [editEaData, setEditEaData] = useState(null); // Add this line to define the state
-
+const [isDeligating, setIsDeligating] = useState(false); // State for deligate button
   const fetchEAList = useCallback(async () => {
     const result = await getEAList();
     if (result && result.error_code === 0) {
@@ -155,6 +155,15 @@ const ManagerDashboard = () => {
     }
   };
 
+  const handledeligate = async () => {
+    setIsDeligating(true);
+    const result = await delegate(session);
+    setIsDeligating(false);
+    if (result === 'Delegated successfully') {
+      console.log('Delegated successfully');
+    }
+  };
+
   const handleRowClick = (eaId) => {
     navigate(`/ea/${eaId}`);
   };
@@ -233,6 +242,8 @@ const ManagerDashboard = () => {
     setCurrentPage(pageNumber);
   };
 
+
+
   const totalPages = Math.ceil(filteredEAs.length / itemsPerPage);
   const paginatedEAs = filteredEAs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -272,6 +283,17 @@ const ManagerDashboard = () => {
               Get RAM
             </>
           )}
+        </button>
+        <button
+          onClick={handledeligate}
+          className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          {isDeligating ? <div className="loader">Deligating...</div> : (
+            <>
+              <PiMemory className="h-5 w-5 mr-2" />
+              Deligate
+              </>
+              )}
         </button>
       </div>
 
