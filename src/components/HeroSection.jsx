@@ -41,7 +41,7 @@ const HeroSection = ({ circleRef, titleRef, nextSectionRef }) => {
             onClick={handleScrollClick}
 
           >
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center h-full cursor-pointer">
               <p className="text-white text-center text-xs">Scroll Down</p>
               <FaArrowDown className="text-white text-xs md:text-sm mt-1" />
             </div>

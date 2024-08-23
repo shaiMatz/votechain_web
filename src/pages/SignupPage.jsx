@@ -324,12 +324,12 @@ const SignupForm = () => {
 					<h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4 text-center text-secondary">Sign Up</h2>
 					{step === 1 && (
 						<>
-							{renderInputField('ID', 'user_id', 'text', 'Enter your ID')}
+							{renderInputField('ID', 'user_id', 'tel', 'Enter ID')}
 							<div className="flex  flex-row space-x-4">
-								{renderInputField('First Name', 'firstname', 'text', 'Enter your first name')}
-								{renderInputField('Last Name', 'lastname', 'text', 'Enter your last name')}
+								{renderInputField('First Name', 'firstname', 'text', 'Enter first name')}
+								{renderInputField('Last Name', 'lastname', 'text', 'Enter last name')}
 							</div>
-							{renderInputField('Phone Number', 'phonenumber', 'text', 'Enter your phone number')}
+							{renderInputField('Phone Number', 'phonenumber', 'tel', 'Enter phone number')}
 
 							<div className="mb-2 md:mb-4">
 								<label className="block text-sm md:text-base font-bold  text-gray-700">Birthday</label>
@@ -354,7 +354,7 @@ const SignupForm = () => {
 								{renderAddressField('City', 'city', cityOptions)}
 								{renderAddressField('Street', 'street', streetOptions)}
 							</div>
-							{renderInputField('Street Number', 'streetNumber', 'text', 'Enter your street number')}
+							{renderInputField('Street Number', 'streetNumber', 'text', 'Enter street number')}
 							<div className="flex flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
 								<button
 									type="button"
