@@ -106,7 +106,7 @@ const LandingPage = () => {
       <GradientBackground />
       <div className="relative">
         <div ref={sectionRef}>
-          <HeroSection circleRef={circleRef} titleRef={titleRef} />
+          <HeroSection circleRef={circleRef} titleRef={titleRef} nextSectionRef={dotRef}/>
         </div>
         <div ref={dotRef} className="absolute w-0 h-0 rounded-full overflow-hidden">
           {/* Apply dynamic styles based on scroll state */}
