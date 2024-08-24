@@ -29,3 +29,38 @@
   font-family: 'Pacifico', cursive;
 }
 
+#style-8::-webkit-scrollbar-track
+{
+	border: none;
+	background-color: transparent;
+}
+
+#style-8::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: transparent;
+}
+
+#style-8::-webkit-scrollbar-thumb
+{
+	background-color: #A238F4;	
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track
+{
+	border: none;
+	background-color: transparent;
+}
+
+::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: #A238F450;	
+  border-radius: 10px;
+}

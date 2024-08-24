@@ -66,13 +66,13 @@ const LandingPage = () => {
         },
         {
           scale: 1,
-          width: '100vw',
-          height: '100vh',
+          width: '100lvw',
+          height: '100lvh',
           x: 0,
           y: 0,
           backgroundColor: '#ffffff60',
           ease: 'power3.inOut',
-          duration: 3,
+          duration: 2,
           borderRadius: '0',
           onUpdate: function () {
             const bounds = dotRef.current.getBoundingClientRect();
@@ -99,7 +99,7 @@ const LandingPage = () => {
   }, [setUser]);
 
   // Dynamic style for HowItWorks component
-  const howItWorksStyle = scrollEnabled ? { overflowY: 'auto', maxHeight: '100vh' } : { overflowY: 'hidden' };
+  const howItWorksStyle = scrollEnabled ? { overflowY: 'auto', maxHeight: '100lvh' } : { overflowY: 'hidden' };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -113,7 +113,7 @@ const LandingPage = () => {
           <HowItWorks scroll={howItWorksStyle.overflowY} style={howItWorksStyle} />
         </div>
 
-        <div style={{ height: '100vh' }} /> {/* Placeholder div */}
+        <div style={{ height: '100lvh' }} /> {/* Placeholder div */}
       </div>
     </div>
   );
