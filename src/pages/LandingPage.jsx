@@ -39,7 +39,7 @@ const LandingPage = () => {
         trigger: sectionRef.current,
         start: 'top top',
         end: 'bottom top',
-        scrub: 1.5,
+        scrub: 1,
         pin: sectionRef.current,
         pinSpacing: false,
         invalidateOnRefresh: true,
@@ -87,7 +87,7 @@ const LandingPage = () => {
           },
         }
       )
-      .to(sectionRef.current, { opacity: 0, duration: 3, ease: 'power3.inOut' }, '<')
+      .to(sectionRef.current, { opacity: 0, duration: 2, ease: 'power3.inOut' }, '<')
       .to(dotRef.current, { scale: 1, duration: 1, ease: 'power2.out' }, '-=1');
 
     // Cleanup function to stop animations and remove ScrollTrigger instances
