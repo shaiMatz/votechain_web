@@ -61,7 +61,7 @@ const LoginPage = () => {
           <div className="mb-4 md:mb-6">
             <label className="block text-sm md:text-base font-bold mb-2 text-gray-700">ID</label>
             <input
-              type="text"
+              type="tel"
               name="user_id"
               value={credentials.user_id}
               onChange={handleChange}
