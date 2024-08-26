@@ -6,6 +6,7 @@ import ElectionList from '../components/ElectionList';
 import Navbar from '../components/Navbar';
 import useAuth from '../hooks/useAuth';
 import { checkIfNftUsed } from '../services/checkIfNftUsed';
+import Footer from '../components/Footer';
 
 const Spinner = () => (
   <div className="flex justify-center items-center min-h-screen">
@@ -77,24 +78,29 @@ const VoterDashboard = () => {
   }
 
   return (
-    <div className={`p-10 ${index === 0 ? 'bg-white-100' : 'bg-white-100'} min-h-screen`}>
+    <div className={`flex flex-col p-10 ${index === 0 ? 'bg-white-100' : 'bg-white-100'} min-h-screen`}>
       <Navbar />
-      <section className="mb-10 mt-6">
-        <ElectionList
-          title="Upcoming Elections"
-          description="Cast your votes in the following upcoming elections."
-          elections={upcomingElections}
-          noElectionMessage="No upcoming elections available."
-        />
-      </section>
-      <section>
-        <ElectionList
-          title="Closed Elections"
-          description="View the results of the following closed elections."
-          elections={closedElections}
-          noElectionMessage="No closed elections available."
-        />
-      </section>
+      <div className='flex-grow'>
+        <section className="mb-10 mt-6">
+          <ElectionList
+            title="Upcoming Elections"
+            description="Cast your votes in the following upcoming elections."
+            elections={upcomingElections}
+            noElectionMessage="No upcoming elections available."
+          />
+        </section>
+        <section>
+          <ElectionList
+            title="Closed Elections"
+            description="View the results of the following closed elections."
+            elections={closedElections}
+            noElectionMessage="No closed elections available."
+          />
+        </section>
+
+      </div>
+     
+      <Footer />
     </div>
   );
 };

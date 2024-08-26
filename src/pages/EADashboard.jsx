@@ -6,6 +6,7 @@ import { ElectionContext } from '../contexts/ElectionContext';
 import { AuthContext } from '../contexts/AuthContext'; // Import AuthContext
 import { ModalContext } from '../contexts/ModalContext';
 import Modal from '../components/Modal';
+import Footer from '../components/Footer';
 
 const EADashboard = () => {
   const { detailedElections:elections, fetchElectionsByEA, fetchDetailedElections, loading, error } = useContext(ElectionContext); // Default to empty array
@@ -60,32 +61,36 @@ const EADashboard = () => {
 
 
   return (
-    <div  className="p-4 md:p-10 min-h-screen">
+    <div  className="flex flex-col p-4 md:p-10 min-h-screen">
       <Navbar />
-      <ElectionActions
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        filter={filter}
-        onFilterChange={handleFilterChange}
-        ea_id={user.id}
+      <div className='flex-grow'>
+        <ElectionActions
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          filter={filter}
+          onFilterChange={handleFilterChange}
+          ea_id={user.id}
 
-      />
-      <div className="mt-6 px-6">
-        <h2 className="text-2xl font-bold text-primary mb-4">Elections</h2>
-        {!loading && filteredElections.length === 0 && elections.length === 0 && (
-          <p className="text-lg text-gray-700">No elections available at the moment. Please check back later or create a new election.</p>
-        )}
-        {!loading && filteredElections.length === 0 && elections.length > 0 && (
-          <p className="text-lg text-gray-700">No elections match your search criteria.</p>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredElections.map((election) => (
-            <ElectionItem key={election.id} election={election} />
-          ))}
+        />
+        <div className="mt-6 px-6">
+          <h2 className="text-2xl font-bold text-primary mb-4">Elections</h2>
+          {!loading && filteredElections.length === 0 && elections.length === 0 && (
+            <p className="text-lg text-gray-700">No elections available at the moment. Please check back later or create a new election.</p>
+          )}
+          {!loading && filteredElections.length === 0 && elections.length > 0 && (
+            <p className="text-lg text-gray-700">No elections match your search criteria.</p>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredElections.map((election) => (
+              <ElectionItem key={election.id} election={election} />
+            ))}
+          </div>
+          {loading && <p className="text-lg text-gray-700">Loading...</p>}
+          {error && <p className="text-lg text-red-500">Error loading elections: {error.message}</p>}
         </div>
-        {loading && <p className="text-lg text-gray-700">Loading...</p>}
-        {error && <p className="text-lg text-red-500">Error loading elections: {error.message}</p>}
+        
       </div>
+     
       {isEAModalOpen && (
         <Modal
           title={modalProps.title}
@@ -94,6 +99,8 @@ const EADashboard = () => {
           onConfirm={modalProps.onConfirm}
         />
       )}
+      
+      <Footer/>
     </div>
   );
 };

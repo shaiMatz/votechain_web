@@ -220,12 +220,12 @@ const VotePage = () => {
                                 }}
                                 onClick={() => {
                                     alert("Remember to return to this page to confirm your vote after verifying!");
-                                    window.open(`https://jungle4.eosq.eosnation.io/tx/${trxId}`, '_blank');
+                                    window.open(`https://jungle4.cryptolions.io/v2/explore/transaction/${trxId}`, '_blank');
                                     setIsLinkOpened(true);
                                 }}
                             >
                                 <iframe
-                                    src={`https://jungle4.eosq.eosnation.io/tx/${trxId}`}
+                                    src={`https://jungle4.cryptolions.io/v2/explore/transaction/${trxId}`}
                                     width="100%"
                                     height="300px"
                                     className="rounded-lg"
@@ -243,7 +243,7 @@ const VotePage = () => {
                             <p className="mb-4 text-sm md:text-md">
                                 Click the link below to verify your vote. Please return to this page to confirm: {" "}
                                 <a
-                                    href={`https://jungle4.eosq.eosnation.io/tx/${trxId}`}
+                                    href={`https://jungle4.cryptolions.io/v2/explore/transaction/${trxId}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 underline hover:text-blue-800"
