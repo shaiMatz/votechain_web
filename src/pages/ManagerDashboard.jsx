@@ -250,7 +250,7 @@ const [isDeligating, setIsDeligating] = useState(false); // State for deligate b
   return (
     <div className="md:p-6 min-h-screen bg-white text-gray-800">
       <Navbar />
-      <div className="mt-4 p-6 flex flex-wrap space-x-4 space-y-4">
+      <div className="mt-4 p-6 flex flex-wrap gap-4">
         <button
           onClick={() => setIsAddEaModalOpen(true)}
           className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -260,19 +260,7 @@ const [isDeligating, setIsDeligating] = useState(false); // State for deligate b
             Add EA
           </>
         </button>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-        >
-          {isClearingTables
-            ? <div className="loader">Clearing...</div>
-            : (
-              <>
-                <IoTrash className="h-5 w-5 mr-2" />
-                Clear Tables
-              </>
-            )}
-        </button>
+        
         <button
           onClick={handleGetRam}
           className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -294,6 +282,19 @@ const [isDeligating, setIsDeligating] = useState(false); // State for deligate b
               Deligate
               </>
               )}
+        </button>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center py-2 px-4 border rounded-lg border-secondary-100 shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          {isClearingTables
+            ? <div className="loader">Clearing...</div>
+            : (
+              <>
+                <IoTrash className="h-5 w-5 mr-2" />
+                Clear Tables
+              </>
+            )}
         </button>
       </div>
 
